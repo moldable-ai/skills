@@ -1,0 +1,28 @@
+{
+  "name": "imessage-scripts",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "create-group-chat": "tsx createGroupChat.ts",
+    "export-conversation": "tsx exportConversation.ts",
+    "get-attachment": "tsx getAttachment.ts",
+    "get-contact": "tsx getContact.ts",
+    "get-conversation": "tsx getConversation.ts",
+    "get-group-chat": "tsx getGroupChat.ts",
+    "get-message": "tsx getMessage.ts",
+    "get-stats": "tsx getStats.ts",
+    "list-attachments": "tsx listAttachments.ts",
+    "list-contacts": "tsx listContacts.ts",
+    "list-group-chats": "tsx listGroupChats.ts",
+    "list-messages": "tsx listMessages.ts",
+    "search": "tsx searchMessages.ts",
+    "send-attachment": "tsx sendAttachment.ts",
+    "send-group-message": "tsx sendGroupMessage.ts",
+    "send-message": "tsx sendMessage.ts"
+  },
+  "dependencies": {
+    "tsx": "^4.7.0",
+    "typescript": "^5.3.0"
+  }
+}
