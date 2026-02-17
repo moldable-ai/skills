@@ -2,6 +2,9 @@
 name: openai-image-gen
 description: Generate images via OpenAI Images API through aivault (no OpenAI API key in skill runtime). Writes images plus an index.html gallery.
 compatibility: Requires `aivault` CLI and Node.js (runs via `npx tsx`).
+dependencies:
+  secrets:
+    - OPENAI_API_KEY
 ---
 
 # OpenAI Image Gen
@@ -21,16 +24,16 @@ This skill uses `openai/image-generation`.
 ## Quick start
 
 ```bash
-{baseDir}/scripts/generate.ts --count 8
+npx -y tsx {baseDir}/scripts/generate.ts --count 8
 ```
 
 ## Common examples
 
 ```bash
-{baseDir}/scripts/generate.ts --prompt "ultra-detailed studio photo of a lobster astronaut" --count 4
-{baseDir}/scripts/generate.ts --model gpt-image-1 --size 1536x1024 --quality high --out-dir ./out/images
-{baseDir}/scripts/generate.ts --model dall-e-3 --style vivid --prompt "serene mountain landscape" --count 1
-{baseDir}/scripts/generate.ts --json
+npx -y tsx {baseDir}/scripts/generate.ts --prompt "ultra-detailed studio photo of a lobster astronaut" --count 4
+npx -y tsx {baseDir}/scripts/generate.ts --model gpt-image-1 --size 1536x1024 --quality high --out-dir ./out/images
+npx -y tsx {baseDir}/scripts/generate.ts --model dall-e-3 --style vivid --prompt "serene mountain landscape" --count 1
+npx -y tsx {baseDir}/scripts/generate.ts --json
 ```
 
 ## Output
@@ -38,4 +41,3 @@ This skill uses `openai/image-generation`.
 - Images written to `--out-dir` (default: `./tmp/openai-image-gen-<timestamp>`).
 - `prompts.json` mapping prompt to filename.
 - `index.html` thumbnail gallery.
-

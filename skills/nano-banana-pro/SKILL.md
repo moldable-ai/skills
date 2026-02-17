@@ -2,6 +2,9 @@
 name: nano-banana-pro
 description: Generate or edit images via Gemini image-capable models through aivault (no Gemini API key in skill runtime).
 compatibility: Requires `aivault` CLI and Node.js (runs via `npx tsx`).
+dependencies:
+  secrets:
+    - GEMINI_API_KEY
 ---
 
 # Nano Banana Pro (Gemini Image Generation)
@@ -19,24 +22,23 @@ aivault secrets create --name GEMINI_API_KEY --value "YOUR_API_KEY" --scope glob
 ## Quick start
 
 ```bash
-{baseDir}/scripts/generate.ts --prompt "a cat eating a nano-banana" --filename ./out.png
+npx -y tsx {baseDir}/scripts/generate.ts --prompt "a cat eating a nano-banana" --filename ./out.png
 ```
 
 ## Common examples
 
 ```bash
 # Higher resolution
-{baseDir}/scripts/generate.ts --prompt "a cozy reading nook" --filename ./out.png --resolution 2K
+npx -y tsx {baseDir}/scripts/generate.ts --prompt "a cozy reading nook" --filename ./out.png --resolution 2K
 
 # Edit with input image(s)
-{baseDir}/scripts/generate.ts --prompt "make it look like a watercolor painting" --filename ./out.png -i ./in.png
+npx -y tsx {baseDir}/scripts/generate.ts --prompt "make it look like a watercolor painting" --filename ./out.png -i ./in.png
 
 # Raw upstream JSON
-{baseDir}/scripts/generate.ts --prompt "a cat eating a nano-banana" --filename ./out.png --json
+npx -y tsx {baseDir}/scripts/generate.ts --prompt "a cat eating a nano-banana" --filename ./out.png --json
 ```
 
 ## Notes
 
 - Default model is `gemini-3-pro-image-preview` (override with `--model`).
 - Uses `generationConfig.responseModalities=["TEXT","IMAGE"]` and `generationConfig.imageConfig.imageSize`.
-

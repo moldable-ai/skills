@@ -2,6 +2,9 @@
 name: openai-transcribe
 description: Transcribe local audio files with OpenAI speech-to-text through aivault capability json (no provider API key in skill runtime).
 compatibility: Requires `aivault` CLI and Node.js (runs via `npx tsx`).
+dependencies:
+  secrets:
+    - OPENAI_API_KEY
 ---
 
 # OpenAI Transcribe
@@ -21,14 +24,14 @@ This skill uses `openai/transcription`.
 ## Quick start
 
 ```bash
-{baseDir}/scripts/transcribe.ts /path/to/audio.m4a
+npx -y tsx {baseDir}/scripts/transcribe.ts /path/to/audio.m4a
 ```
 
 ## Common examples
 
 ```bash
-{baseDir}/scripts/transcribe.ts /path/to/audio.wav
-{baseDir}/scripts/transcribe.ts /path/to/audio.wav --json
+npx -y tsx {baseDir}/scripts/transcribe.ts /path/to/audio.wav
+npx -y tsx {baseDir}/scripts/transcribe.ts /path/to/audio.wav --json
 ```
 
 ## Notes

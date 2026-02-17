@@ -2,6 +2,9 @@
 name: elevenlabs-transcribe
 description: Transcribe audio with ElevenLabs speech-to-text through aivault capability json (no provider API key in skill runtime).
 compatibility: Requires `aivault` CLI and Node.js (runs via `npx tsx`).
+dependencies:
+  secrets:
+    - ELEVENLABS_API_KEY
 ---
 
 # ElevenLabs Transcribe
@@ -19,15 +22,15 @@ aivault secrets create --name ELEVENLABS_API_KEY --value "YOUR_API_KEY" --scope 
 ## Quick start
 
 ```bash
-{baseDir}/scripts/transcribe.ts /path/to/audio.mp3
+npx -y tsx {baseDir}/scripts/transcribe.ts /path/to/audio.mp3
 ```
 
 ## Common examples
 
 ```bash
-{baseDir}/scripts/transcribe.ts /path/to/audio.mp3
-{baseDir}/scripts/transcribe.ts /path/to/audio.mp3 --json
-{baseDir}/scripts/transcribe.ts --url https://example.com/audio.mp3
+npx -y tsx {baseDir}/scripts/transcribe.ts /path/to/audio.mp3
+npx -y tsx {baseDir}/scripts/transcribe.ts /path/to/audio.mp3 --json
+npx -y tsx {baseDir}/scripts/transcribe.ts --url https://example.com/audio.mp3
 ```
 
 ## Notes

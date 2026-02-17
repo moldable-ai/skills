@@ -2,6 +2,9 @@
 name: notion
 description: Use Notion via aivault-backed capabilities (search, pages, blocks). No Notion API key is ever read by the skill runtime.
 compatibility: Requires `aivault` CLI and Node.js (runs via `npx tsx`).
+dependencies:
+  secrets:
+    - NOTION_TOKEN
 ---
 
 # Notion
@@ -21,30 +24,29 @@ This skill uses `notion/search`, `notion/pages`, and `notion/blocks`.
 ## Quick start
 
 ```bash
-{baseDir}/scripts/notion.ts search --query "roadmap"
+npx -y tsx {baseDir}/scripts/notion.ts search --query "roadmap"
 ```
 
 ## Common examples
 
 ```bash
 # Search (pages only)
-{baseDir}/scripts/notion.ts search --query "meeting notes" --type page
+npx -y tsx {baseDir}/scripts/notion.ts search --query "meeting notes" --type page
 
 # Get a page
-{baseDir}/scripts/notion.ts page-get --id <page-id>
+npx -y tsx {baseDir}/scripts/notion.ts page-get --id <page-id>
 
 # Create a page in a database (default title property name is "Name")
-{baseDir}/scripts/notion.ts page-create --database-id <db-id> --title "Weekly Notes"
+npx -y tsx {baseDir}/scripts/notion.ts page-create --database-id <db-id> --title "Weekly Notes"
 
 # List block children
-{baseDir}/scripts/notion.ts block-children --id <block-id>
+npx -y tsx {baseDir}/scripts/notion.ts block-children --id <block-id>
 
 # Raw upstream JSON
-{baseDir}/scripts/notion.ts search --query "roadmap" --json
+npx -y tsx {baseDir}/scripts/notion.ts search --query "roadmap" --json
 ```
 
 ## Notes
 
 - Notion-Version header is pinned to `2025-09-03` in the script.
 - All API calls go through `aivault json ...` with explicit `--method`/`--path`.
-

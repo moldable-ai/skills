@@ -1,0 +1,11 @@
+{
+  "name": "moldable-skills",
+  "private": true,
+  "scripts": {
+    "check:shebang-executable": "./scripts/check-shebang-executable.sh",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "husky": "^9.1.7"
+  }
+}

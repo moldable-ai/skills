@@ -2,6 +2,9 @@
 name: todoist
 description: Manage Todoist tasks/projects/comments via aivault-backed capabilities (no Todoist token in skill runtime).
 compatibility: Requires `aivault` CLI and Node.js (runs via `npx tsx`).
+dependencies:
+  secrets:
+    - TODOIST_TOKEN
 ---
 
 # Todoist
@@ -21,16 +24,15 @@ This skill uses `todoist/tasks`, `todoist/projects`, and `todoist/comments`.
 ## Quick start
 
 ```bash
-{baseDir}/scripts/todoist.ts tasks-list
+npx -y tsx {baseDir}/scripts/todoist.ts tasks-list
 ```
 
 ## Common examples
 
 ```bash
-{baseDir}/scripts/todoist.ts tasks-create --content "Buy milk" --due "tomorrow"
-{baseDir}/scripts/todoist.ts tasks-close --id <task-id>
-{baseDir}/scripts/todoist.ts projects-list
-{baseDir}/scripts/todoist.ts comments-add --task-id <task-id> --content "FYI this is blocked"
-{baseDir}/scripts/todoist.ts tasks-list --json
+npx -y tsx {baseDir}/scripts/todoist.ts tasks-create --content "Buy milk" --due "tomorrow"
+npx -y tsx {baseDir}/scripts/todoist.ts tasks-close --id <task-id>
+npx -y tsx {baseDir}/scripts/todoist.ts projects-list
+npx -y tsx {baseDir}/scripts/todoist.ts comments-add --task-id <task-id> --content "FYI this is blocked"
+npx -y tsx {baseDir}/scripts/todoist.ts tasks-list --json
 ```
-

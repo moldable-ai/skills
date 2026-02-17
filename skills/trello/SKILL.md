@@ -2,6 +2,10 @@
 name: trello
 description: Manage Trello boards/lists/cards via aivault-backed capabilities (no Trello key/token in skill runtime).
 compatibility: Requires `aivault` CLI and Node.js (runs via `npx tsx`).
+dependencies:
+  secrets:
+    - TRELLO_API_KEY
+    - TRELLO_TOKEN
 ---
 
 # Trello
@@ -25,15 +29,14 @@ This skill uses `trello/members`, `trello/boards`, `trello/lists`, and `trello/c
 ## Quick start
 
 ```bash
-{baseDir}/scripts/trello.ts boards-list
+npx -y tsx {baseDir}/scripts/trello.ts boards-list
 ```
 
 ## Common examples
 
 ```bash
-{baseDir}/scripts/trello.ts boards-list --json
-{baseDir}/scripts/trello.ts lists-list --board-id <board-id>
-{baseDir}/scripts/trello.ts cards-list --list-id <list-id>
-{baseDir}/scripts/trello.ts card-create --list-id <list-id> --name "Ship it" --desc "Created via aivault"
+npx -y tsx {baseDir}/scripts/trello.ts boards-list --json
+npx -y tsx {baseDir}/scripts/trello.ts lists-list --board-id <board-id>
+npx -y tsx {baseDir}/scripts/trello.ts cards-list --list-id <list-id>
+npx -y tsx {baseDir}/scripts/trello.ts card-create --list-id <list-id> --name "Ship it" --desc "Created via aivault"
 ```
-

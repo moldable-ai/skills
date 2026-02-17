@@ -2,6 +2,9 @@
 name: deepgram-transcribe
 description: Transcribe audio with Deepgram through aivault capability json (no provider API key in skill runtime).
 compatibility: Requires `aivault` CLI and Node.js (runs via `npx tsx`).
+dependencies:
+  secrets:
+    - DEEPGRAM_API_KEY
 ---
 
 # Deepgram Transcribe
@@ -19,15 +22,15 @@ aivault secrets create --name DEEPGRAM_API_KEY --value "YOUR_API_KEY" --scope gl
 ## Quick start
 
 ```bash
-{baseDir}/scripts/transcribe.ts /path/to/audio.wav
+npx -y tsx {baseDir}/scripts/transcribe.ts /path/to/audio.wav
 ```
 
 ## Common examples
 
 ```bash
-{baseDir}/scripts/transcribe.ts /path/to/audio.wav
-{baseDir}/scripts/transcribe.ts /path/to/audio.wav --json
-{baseDir}/scripts/transcribe.ts --url https://example.com/audio.mp3
+npx -y tsx {baseDir}/scripts/transcribe.ts /path/to/audio.wav
+npx -y tsx {baseDir}/scripts/transcribe.ts /path/to/audio.wav --json
+npx -y tsx {baseDir}/scripts/transcribe.ts --url https://example.com/audio.mp3
 ```
 
 ## Notes
