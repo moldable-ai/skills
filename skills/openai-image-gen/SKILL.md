@@ -2,9 +2,10 @@
 name: openai-image-gen
 description: Generate images via OpenAI Images API through aivault (no OpenAI API key in skill runtime). Writes images plus an index.html gallery.
 compatibility: Requires `aivault` CLI and Node.js (runs via `npx tsx`).
-dependencies:
-  secrets:
-    - OPENAI_API_KEY
+credentials:
+  - name: OPENAI_API_KEY
+    description: OpenAI API key for image generation
+    required: true
 ---
 
 # OpenAI Image Gen

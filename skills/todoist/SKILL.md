@@ -2,9 +2,10 @@
 name: todoist
 description: Manage Todoist tasks/projects/comments via aivault-backed capabilities (no Todoist token in skill runtime).
 compatibility: Requires `aivault` CLI and Node.js (runs via `npx tsx`).
-dependencies:
-  secrets:
-    - TODOIST_TOKEN
+credentials:
+  - name: TODOIST_TOKEN
+    description: Todoist API token for task and project management
+    required: true
 ---
 
 # Todoist

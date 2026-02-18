@@ -2,9 +2,10 @@
 name: deepgram-transcribe
 description: Transcribe audio with Deepgram through aivault capability json (no provider API key in skill runtime).
 compatibility: Requires `aivault` CLI and Node.js (runs via `npx tsx`).
-dependencies:
-  secrets:
-    - DEEPGRAM_API_KEY
+credentials:
+  - name: DEEPGRAM_API_KEY
+    description: Deepgram API key for speech-to-text transcription
+    required: true
 ---
 
 # Deepgram Transcribe

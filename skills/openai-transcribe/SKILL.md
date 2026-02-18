@@ -2,9 +2,10 @@
 name: openai-transcribe
 description: Transcribe local audio files with OpenAI speech-to-text through aivault capability json (no provider API key in skill runtime).
 compatibility: Requires `aivault` CLI and Node.js (runs via `npx tsx`).
-dependencies:
-  secrets:
-    - OPENAI_API_KEY
+credentials:
+  - name: OPENAI_API_KEY
+    description: OpenAI API key for speech-to-text transcription
+    required: true
 ---
 
 # OpenAI Transcribe

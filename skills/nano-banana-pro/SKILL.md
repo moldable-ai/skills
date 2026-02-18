@@ -2,9 +2,10 @@
 name: nano-banana-pro
 description: Generate or edit images via Gemini image-capable models through aivault (no Gemini API key in skill runtime).
 compatibility: Requires `aivault` CLI and Node.js (runs via `npx tsx`).
-dependencies:
-  secrets:
-    - GEMINI_API_KEY
+credentials:
+  - name: GEMINI_API_KEY
+    description: Google Gemini API key for image generation and editing
+    required: true
 ---
 
 # Nano Banana Pro (Gemini Image Generation)

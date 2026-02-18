@@ -2,9 +2,10 @@
 name: notion
 description: Use Notion via aivault-backed capabilities (search, pages, blocks). No Notion API key is ever read by the skill runtime.
 compatibility: Requires `aivault` CLI and Node.js (runs via `npx tsx`).
-dependencies:
-  secrets:
-    - NOTION_TOKEN
+credentials:
+  - name: NOTION_TOKEN
+    description: Notion internal integration token with read/write access to pages and databases
+    required: true
 ---
 
 # Notion

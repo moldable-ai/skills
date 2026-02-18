@@ -2,9 +2,10 @@
 name: elevenlabs-transcribe
 description: Transcribe audio with ElevenLabs speech-to-text through aivault capability json (no provider API key in skill runtime).
 compatibility: Requires `aivault` CLI and Node.js (runs via `npx tsx`).
-dependencies:
-  secrets:
-    - ELEVENLABS_API_KEY
+credentials:
+  - name: ELEVENLABS_API_KEY
+    description: ElevenLabs API key for speech-to-text transcription
+    required: true
 ---
 
 # ElevenLabs Transcribe

@@ -2,10 +2,13 @@
 name: trello
 description: Manage Trello boards/lists/cards via aivault-backed capabilities (no Trello key/token in skill runtime).
 compatibility: Requires `aivault` CLI and Node.js (runs via `npx tsx`).
-dependencies:
-  secrets:
-    - TRELLO_API_KEY
-    - TRELLO_TOKEN
+credentials:
+  - name: TRELLO_API_KEY
+    description: Trello API key for board access
+    required: true
+  - name: TRELLO_TOKEN
+    description: Trello member token with read/write scope
+    required: true
 ---
 
 # Trello
