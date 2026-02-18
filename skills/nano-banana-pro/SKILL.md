@@ -14,6 +14,13 @@ This skill uses aivault to keep your Gemini API key safe. It calls the Gemini RE
 
 ## Setup
 
+Install `aivault` if it is not already available:
+
+```bash
+curl -fsSL https://aivault.moldable.sh/install.sh | sh
+```
+
+
 Store your Gemini API key in aivault. The credential and all `gemini/*` capabilities are auto-provisioned from the built-in registry.
 
 ```bash

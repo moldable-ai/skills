@@ -14,6 +14,13 @@ This skill uses aivault to keep your Google Places API key safe.
 
 ## Setup
 
+Install `aivault` if it is not already available:
+
+```bash
+curl -fsSL https://aivault.moldable.sh/install.sh | sh
+```
+
+
 Store your Google Places API key in aivault. The credential and all `google-places/*` capabilities are auto-provisioned from the built-in registry.
 
 ```bash

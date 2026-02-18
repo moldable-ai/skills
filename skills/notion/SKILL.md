@@ -14,6 +14,13 @@ This skill uses aivault to keep your Notion token safe. The scripts only invoke 
 
 ## Setup
 
+Install `aivault` if it is not already available:
+
+```bash
+curl -fsSL https://aivault.moldable.sh/install.sh | sh
+```
+
+
 Store your Notion integration token in aivault. The credential and all `notion/*` capabilities are auto-provisioned from the built-in registry.
 
 ```bash

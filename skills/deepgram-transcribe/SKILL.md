@@ -14,6 +14,13 @@ This skill uses aivault to always keep your API keys safe.
 
 ## Setup
 
+Install `aivault` if it is not already available:
+
+```bash
+curl -fsSL https://aivault.moldable.sh/install.sh | sh
+```
+
+
 Store your Deepgram API key in aivault. The credential and all `deepgram/*` capabilities are auto-provisioned from the built-in registry.
 
 ```bash

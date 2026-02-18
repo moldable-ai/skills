@@ -14,6 +14,13 @@ This skill uses aivault to keep your Todoist API token safe.
 
 ## Setup
 
+Install `aivault` if it is not already available:
+
+```bash
+curl -fsSL https://aivault.moldable.sh/install.sh | sh
+```
+
+
 Store your Todoist API token in aivault. The credential and all `todoist/*` capabilities are auto-provisioned from the built-in registry.
 
 ```bash

@@ -7,6 +7,14 @@ description: Complete guide for using aivault as a zero-trust local vault and pr
 
 This skill covers secure setup and day-to-day use of `aivault` for agent workflows.
 
+## Install
+
+Install `aivault` if it is not already available:
+
+```bash
+curl -fsSL https://aivault.moldable.sh/install.sh | sh
+```
+
 ## Quick Reference
 
 | Resource | Path |

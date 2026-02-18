@@ -17,6 +17,13 @@ This skill uses aivault to keep your Trello credentials safe.
 
 ## Setup
 
+Install `aivault` if it is not already available:
+
+```bash
+curl -fsSL https://aivault.moldable.sh/install.sh | sh
+```
+
+
 Store your Trello API key and user token in aivault. The credential and all `trello/*` capabilities are auto-provisioned once both secrets are present.
 
 ```bash
