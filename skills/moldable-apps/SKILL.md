@@ -20,7 +20,7 @@ This skill provides comprehensive knowledge for building and modifying apps with
 
 ## Default Tech Stack
 
-- **Framework**: Next.js 16 + React 19 + TypeScript
+- **Framework**: Vite + Hono + React 19 + TypeScript
 - **Styling**: Tailwind CSS 4 + shadcn/ui (semantic colors only)
 - **State**: TanStack Query v5
 - **Storage**: Filesystem via `@moldable-ai/storage`
@@ -44,10 +44,10 @@ scaffoldApp({
 ```
 
 **After scaffolding**, customize:
-- `src/app/page.tsx` — Main app view
-- `src/app/widget/page.tsx` — Widget view
-- `src/app/api/` — API routes
-- `src/components/` — React components
+- `src/client/app.tsx` — Main app view
+- `src/client/widget.tsx` — Widget view
+- `src/server/app.ts` or `src/server/routes/` — Hono API routes
+- `src/client/components/` or `src/components/` — React components
 
 ## Detailed References
 
@@ -144,23 +144,24 @@ window.parent.postMessage({
 Required providers for Moldable apps:
 
 ```tsx
-// src/app/layout.tsx
+// src/client/main.tsx
+import { StrictMode } from 'react'
+import { createRoot } from 'react-dom/client'
 import { ThemeProvider, WorkspaceProvider } from '@moldable-ai/ui'
-import { QueryProvider } from '@/lib/query-provider'
+import { App } from './app'
+import { QueryProvider } from './query-provider'
 
-export default function RootLayout({ children }) {
-  return (
-    <html lang="en" suppressHydrationWarning>
-      <body>
-        <ThemeProvider>
-          <WorkspaceProvider>
-            <QueryProvider>{children}</QueryProvider>
-          </WorkspaceProvider>
-        </ThemeProvider>
-      </body>
-    </html>
-  )
-}
+createRoot(document.getElementById('root')!).render(
+  <StrictMode>
+    <ThemeProvider>
+      <WorkspaceProvider>
+        <QueryProvider>
+          <App />
+        </QueryProvider>
+      </WorkspaceProvider>
+    </ThemeProvider>
+  </StrictMode>,
+)
 ```
 
 ### 5. Adding Dependencies
