@@ -28,25 +28,26 @@ src/server/static.ts
 
 ## Lint Rules Summary
 
-| Rule | Severity | Requirement |
-| --- | --- | --- |
-| `moldable-json-exists` | Error | `moldable.json` must exist |
-| `moldable-json-valid` | Error | Manifest must be valid JSON |
-| `moldable-json-fields` | Error | Manifest must include `name`, `icon`, `description`, `widgetSize` |
-| `moldable-json-runtime` | Error | Manifest runtime must be `vite_hono` |
-| `vite-config-exists` | Error | `vite.config.ts` must exist |
-| `hono-server-entry` | Error | `src/server/index.ts` must exist |
-| `moldable-dev-script` | Error | `scripts/moldable-dev.mjs` must exist |
-| `moldable-dev-syntax` | Error | Dev script must launch the Hono server with `tsx` and track `.moldable.instances.json` |
-| `package-json-dev-script` | Error | `dev` script must use `node ./scripts/moldable-dev.mjs` |
-| `widget-file` | Error | `src/client/widget.tsx` must exist |
-| `widget-ghost-state` | Warning | Widget should include `GHOST_EXAMPLES` |
-| `health-route` | Error | `src/server/app.ts` must expose `/api/moldable/health` |
-| `gitignore-valid` | Error | `.gitignore` must ignore `dist` and `node_modules` |
-| `eslint-config-app` | Error | `eslint.config.js` must use `@moldable-ai/eslint-config/app` |
-| `no-localstorage` | Warning | Use filesystem storage, not browser storage |
-| `workspace-provider` | Error | Client entry must use `WorkspaceProvider` |
-| `app-registered` | Error | App must be registered in workspace `config.json` |
+| Rule                      | Severity | Requirement                                                                                  |
+| ------------------------- | -------- | -------------------------------------------------------------------------------------------- |
+| `moldable-json-exists`    | Error    | `moldable.json` must exist                                                                   |
+| `moldable-json-valid`     | Error    | Manifest must be valid JSON                                                                  |
+| `moldable-json-fields`    | Error    | Manifest must include `name`, `icon`, `description`, `widgetSize`                            |
+| `moldable-json-runtime`   | Error    | Manifest runtime must be `vite_hono`                                                         |
+| `vite-config-exists`      | Error    | `vite.config.ts` must exist                                                                  |
+| `hono-server-entry`       | Error    | `src/server/index.ts` must exist                                                             |
+| `vite-hmr-portless`       | Error    | `src/server/index.ts` must configure Vite HMR from `MOLDABLE_APP_URL`                        |
+| `moldable-dev-script`     | Error    | `scripts/moldable-dev.mjs` must exist                                                        |
+| `moldable-dev-syntax`     | Error    | Dev script must launch the Hono server with `tsx watch` and track `.moldable.instances.json` |
+| `package-json-dev-script` | Error    | `dev` script must use `node ./scripts/moldable-dev.mjs`                                      |
+| `widget-file`             | Error    | `src/client/widget.tsx` must exist                                                           |
+| `widget-ghost-state`      | Warning  | Widget should include `GHOST_EXAMPLES`                                                       |
+| `health-route`            | Error    | `src/server/app.ts` must expose `/api/moldable/health`                                       |
+| `gitignore-valid`         | Error    | `.gitignore` must ignore `dist` and `node_modules`                                           |
+| `eslint-config-app`       | Error    | `eslint.config.js` must use `@moldable-ai/eslint-config/app`                                 |
+| `no-localstorage`         | Warning  | Use filesystem storage, not browser storage                                                  |
+| `workspace-provider`      | Error    | Client entry must use `WorkspaceProvider`                                                    |
+| `app-registered`          | Error    | App must be registered in workspace `config.json`                                            |
 
 ## Core Templates
 
@@ -95,22 +96,22 @@ src/server/static.ts
 ### `eslint.config.js`
 
 ```js
-import app from '@moldable-ai/eslint-config/app'
+import app from "@moldable-ai/eslint-config/app";
 
-export default app
+export default app;
 ```
 
 ### `src/client/main.tsx`
 
 ```tsx
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import { ThemeProvider, WorkspaceProvider } from '@moldable-ai/ui'
-import { App } from './app'
-import { QueryProvider } from './query-provider'
-import './globals.css'
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import { ThemeProvider, WorkspaceProvider } from "@moldable-ai/ui";
+import { App } from "./app";
+import { QueryProvider } from "./query-provider";
+import "./globals.css";
 
-createRoot(document.getElementById('root')!).render(
+createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <ThemeProvider>
       <WorkspaceProvider>
@@ -120,43 +121,39 @@ createRoot(document.getElementById('root')!).render(
       </WorkspaceProvider>
     </ThemeProvider>
   </StrictMode>,
-)
+);
 ```
 
 ### `src/client/widget.tsx`
 
 ```tsx
 const GHOST_EXAMPLES = [
-  { text: 'First example item', icon: '📝' },
-  { text: 'Second example item', icon: '✨' },
-  { text: 'Third example item', icon: '🎯' },
-]
+  { text: "First example item", icon: "📝" },
+  { text: "Second example item", icon: "✨" },
+  { text: "Third example item", icon: "🎯" },
+];
 
 export function Widget() {
-  return (
-    <div className="flex h-full flex-col p-2">
-      {/* Widget content */}
-    </div>
-  )
+  return <div className="flex h-full flex-col p-2">{/* Widget content */}</div>;
 }
 ```
 
 ### `src/server/app.ts`
 
 ```ts
-import { Hono } from 'hono'
-import { cors } from 'hono/cors'
+import { Hono } from "hono";
+import { cors } from "hono/cors";
 
-export const app = new Hono()
+export const app = new Hono();
 
-app.use('/api/*', cors())
+app.use("/api/*", cors());
 
-app.get('/api/moldable/health', (c) => {
+app.get("/api/moldable/health", (c) => {
   return c.json({
-    appId: process.env.MOLDABLE_APP_ID ?? 'my-app',
-    status: 'ok',
-  })
-})
+    appId: process.env.MOLDABLE_APP_ID ?? "my-app",
+    status: "ok",
+  });
+});
 ```
 
 ### `.gitignore`
@@ -181,6 +178,31 @@ dist/
 // Correct
 "dev": "node ./scripts/moldable-dev.mjs"
 ```
+
+### Missing Portless-Aware HMR
+
+`src/server/index.ts` must configure Vite HMR from `MOLDABLE_APP_URL` so the webview connects through the same `.localhost` route that Portless exposes.
+
+```ts
+function createHmrOptions(server: HttpServer): HmrOptions {
+  const appUrl = process.env.MOLDABLE_APP_URL;
+  if (!appUrl) return { server };
+
+  const url = new URL(appUrl);
+  const isHttps = url.protocol === "https:";
+
+  return {
+    server,
+    protocol: isHttps ? "wss" : "ws",
+    host: url.hostname,
+    clientPort: url.port ? Number(url.port) : isHttps ? 443 : 80,
+  };
+}
+```
+
+### Missing Server Watch Mode
+
+`scripts/moldable-dev.mjs` must run the Hono server with `tsx watch --clear-screen=false src/server/index.ts` in development. Vite HMR updates client modules, but server/API files need the Node process to reload changed modules.
 
 ### Missing WorkspaceProvider
 

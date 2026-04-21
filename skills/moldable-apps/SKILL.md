@@ -9,14 +9,14 @@ This skill provides comprehensive knowledge for building and modifying apps with
 
 ## Quick Reference
 
-| Resource | Path |
-|----------|------|
-| App source code | `~/.moldable/shared/apps/{app-id}/` |
+| Resource         | Path                                                        |
+| ---------------- | ----------------------------------------------------------- |
+| App source code  | `~/.moldable/shared/apps/{app-id}/`                         |
 | App runtime data | `~/.moldable/workspaces/{workspace-id}/apps/{app-id}/data/` |
-| Workspace config | `~/.moldable/workspaces/{workspace-id}/config.json` |
-| MCP config | `~/.moldable/shared/config/mcp.json` |
-| Skills | `~/.moldable/shared/skills/{repo}/{skill}/` |
-| Environment | `~/.moldable/shared/.env` |
+| Workspace config | `~/.moldable/workspaces/{workspace-id}/config.json`         |
+| MCP config       | `~/.moldable/shared/config/mcp.json`                        |
+| Skills           | `~/.moldable/shared/skills/{repo}/{skill}/`                 |
+| Environment      | `~/.moldable/shared/.env`                                   |
 
 ## Default Tech Stack
 
@@ -24,6 +24,7 @@ This skill provides comprehensive knowledge for building and modifying apps with
 - **Styling**: Tailwind CSS 4 + shadcn/ui (semantic colors only)
 - **State**: TanStack Query v5
 - **Storage**: Filesystem via `@moldable-ai/storage`
+- **Dev Reloading**: Vite client HMR via Portless-aware `MOLDABLE_APP_URL`; Hono server reloads via `tsx watch`
 - **Package Manager**: pnpm
 
 ## Creating Apps
@@ -32,18 +33,20 @@ This skill provides comprehensive knowledge for building and modifying apps with
 
 ```typescript
 scaffoldApp({
-  appId: "expense-tracker",   // lowercase, hyphens only
-  name: "Expense Tracker",    // Display name
-  icon: "💰",                 // Emoji icon
+  appId: "expense-tracker", // lowercase, hyphens only
+  name: "Expense Tracker", // Display name
+  icon: "💰", // Emoji icon
   description: "Track expenses and generate reports",
-  widgetSize: "medium",       // small, medium, or large
-  extraDependencies: {        // Optional npm packages
-    "zod": "^3.0.0"
-  }
-})
+  widgetSize: "medium", // small, medium, or large
+  extraDependencies: {
+    // Optional npm packages
+    zod: "^3.0.0",
+  },
+});
 ```
 
 **After scaffolding**, customize:
+
 - `src/client/app.tsx` — Main app view
 - `src/client/widget.tsx` — Widget view
 - `src/server/app.ts` or `src/server/routes/` — Hono API routes
@@ -54,12 +57,14 @@ scaffoldApp({
 Read these for in-depth guidance:
 
 ### Core Concepts
+
 - [references/app-lifecycle.md](references/app-lifecycle.md) — Creating, starting, managing, and deleting apps
 - [references/app-scaffold.md](references/app-scaffold.md) — **Required files**, lint rules, templates for new apps
 - [references/workspaces.md](references/workspaces.md) — Workspace system, data isolation, environment layering
 - [references/configuration.md](references/configuration.md) — moldable.json, config.json, environment variables
 
 ### Implementation Patterns
+
 - [references/ui.md](references/ui.md) — **@moldable-ai/ui components**, shadcn/ui, themes, rich text editor
 - [references/storage-patterns.md](references/storage-patterns.md) — Filesystem storage, React Query, workspace-aware APIs
 - [references/desktop-apis.md](references/desktop-apis.md) — postMessage APIs (open-url, show-in-folder, set-chat-input, save-file)
@@ -73,18 +78,29 @@ Read these for in-depth guidance:
 
 ```tsx
 // Import components from @moldable-ai/ui (NOT from shadcn directly)
-import { 
-  Button, Card, Input, Dialog, Select, Tabs,
-  ThemeProvider, WorkspaceProvider, useTheme,
-  Markdown, CodeBlock, WidgetLayout,
-  downloadFile, sendToMoldable
-} from '@moldable-ai/ui'
+import {
+  Button,
+  Card,
+  Input,
+  Dialog,
+  Select,
+  Tabs,
+  ThemeProvider,
+  WorkspaceProvider,
+  useTheme,
+  Markdown,
+  CodeBlock,
+  WidgetLayout,
+  downloadFile,
+  sendToMoldable,
+} from "@moldable-ai/ui";
 
 // For rich text editing
-import { MarkdownEditor } from '@moldable-ai/editor'
+import { MarkdownEditor } from "@moldable-ai/editor";
 ```
 
 **Use semantic colors only:**
+
 ```tsx
 // ✅ Correct
 <div className="bg-background text-foreground border-border" />
@@ -102,18 +118,18 @@ All apps **must** isolate data per workspace:
 
 ```tsx
 // Client - use workspaceId in query keys
-const { workspaceId, fetchWithWorkspace } = useWorkspace()
+const { workspaceId, fetchWithWorkspace } = useWorkspace();
 const { data } = useQuery({
-  queryKey: ['items', workspaceId],  // ← Include workspace!
-  queryFn: () => fetchWithWorkspace('/api/items').then(r => r.json())
-})
+  queryKey: ["items", workspaceId], // ← Include workspace!
+  queryFn: () => fetchWithWorkspace("/api/items").then((r) => r.json()),
+});
 
 // Server - extract workspace from request
-import { getWorkspaceFromRequest, getAppDataDir } from '@moldable-ai/storage'
+import { getWorkspaceFromRequest, getAppDataDir } from "@moldable-ai/storage";
 
 export async function GET(request: Request) {
-  const workspaceId = getWorkspaceFromRequest(request)
-  const dataDir = getAppDataDir(workspaceId)
+  const workspaceId = getWorkspaceFromRequest(request);
+  const dataDir = getAppDataDir(workspaceId);
   // Read/write files in dataDir
 }
 ```
@@ -124,19 +140,31 @@ Apps communicate with Moldable desktop via postMessage:
 
 ```typescript
 // Open external URL
-window.parent.postMessage({ type: 'moldable:open-url', url: 'https://...' }, '*')
+window.parent.postMessage(
+  { type: "moldable:open-url", url: "https://..." },
+  "*",
+);
 
 // Show file in Finder
-window.parent.postMessage({ type: 'moldable:show-in-folder', path: '/path/to/file' }, '*')
+window.parent.postMessage(
+  { type: "moldable:show-in-folder", path: "/path/to/file" },
+  "*",
+);
 
 // Pre-populate chat input
-window.parent.postMessage({ type: 'moldable:set-chat-input', text: 'Help me...' }, '*')
+window.parent.postMessage(
+  { type: "moldable:set-chat-input", text: "Help me..." },
+  "*",
+);
 
 // Provide context to AI
-window.parent.postMessage({ 
-  type: 'moldable:set-chat-instructions', 
-  text: 'User is viewing meeting #123...' 
-}, '*')
+window.parent.postMessage(
+  {
+    type: "moldable:set-chat-instructions",
+    text: "User is viewing meeting #123...",
+  },
+  "*",
+);
 ```
 
 ### 4. Layout Setup
@@ -145,13 +173,13 @@ Required providers for Moldable apps:
 
 ```tsx
 // src/client/main.tsx
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import { ThemeProvider, WorkspaceProvider } from '@moldable-ai/ui'
-import { App } from './app'
-import { QueryProvider } from './query-provider'
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import { ThemeProvider, WorkspaceProvider } from "@moldable-ai/ui";
+import { App } from "./app";
+import { QueryProvider } from "./query-provider";
 
-createRoot(document.getElementById('root')!).render(
+createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <ThemeProvider>
       <WorkspaceProvider>
@@ -161,7 +189,7 @@ createRoot(document.getElementById('root')!).render(
       </WorkspaceProvider>
     </ThemeProvider>
   </StrictMode>,
-)
+);
 ```
 
 ### 5. Adding Dependencies
@@ -170,20 +198,20 @@ Use `sandbox: false` for package manager commands:
 
 ```typescript
 await runCommand({
-  command: 'cd ~/.moldable/shared/apps/my-app && pnpm add zod',
-  sandbox: false  // Required for network access
-})
+  command: "cd ~/.moldable/shared/apps/my-app && pnpm add zod",
+  sandbox: false, // Required for network access
+});
 ```
 
 ## App Management Tools
 
-| Tool | Purpose | Reversible |
-|------|---------|------------|
-| `scaffoldApp` | Create new app | — |
-| `getAppInfo` | Check which workspaces use an app | — |
-| `unregisterApp` | Remove from current workspace only | ✅ Re-add later |
-| `deleteAppData` | Delete app's data (keep installed) | ❌ Data lost |
-| `deleteApp` | **Permanently** delete from ALL workspaces | ❌ Everything lost |
+| Tool            | Purpose                                    | Reversible         |
+| --------------- | ------------------------------------------ | ------------------ |
+| `scaffoldApp`   | Create new app                             | —                  |
+| `getAppInfo`    | Check which workspaces use an app          | —                  |
+| `unregisterApp` | Remove from current workspace only         | ✅ Re-add later    |
+| `deleteAppData` | Delete app's data (keep installed)         | ❌ Data lost       |
+| `deleteApp`     | **Permanently** delete from ALL workspaces | ❌ Everything lost |
 
 ## File Structure
 

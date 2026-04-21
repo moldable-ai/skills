@@ -8,15 +8,15 @@ Always use `scaffoldApp`. It creates the app in `~/.moldable/shared/apps/{appId}
 
 ```ts
 const result = await scaffoldApp({
-  appId: 'expense-tracker',
-  name: 'Expense Tracker',
-  icon: '💰',
-  description: 'Track expenses and generate reports',
-  widgetSize: 'medium',
+  appId: "expense-tracker",
+  name: "Expense Tracker",
+  icon: "💰",
+  description: "Track expenses and generate reports",
+  widgetSize: "medium",
   extraDependencies: {
-    zod: '^3.0.0',
+    zod: "^3.0.0",
   },
-})
+});
 ```
 
 ## What `scaffoldApp` Does
@@ -62,7 +62,7 @@ When an app starts, Moldable:
 
 ## Dev Script
 
-`scripts/moldable-dev.mjs` launches the Hono server with `tsx`, forwards Moldable runtime environment, records the child process in `.moldable.instances.json`, and removes that record on exit.
+`scripts/moldable-dev.mjs` launches the Hono server with `tsx watch` in development, forwards Moldable runtime environment, records the child process in `.moldable.instances.json`, and removes that record on exit. Watch mode is required because server/API modules are loaded by Node, not by Vite's client HMR pipeline.
 
 Apps should keep:
 
@@ -80,29 +80,31 @@ Apps should keep:
 
 ## App States
 
-| State | Description |
-| --- | --- |
-| Stopped | No process is running |
+| State    | Description                                            |
+| -------- | ------------------------------------------------------ |
+| Stopped  | No process is running                                  |
 | Starting | Moldable spawned the process and is waiting for health |
-| Running | App responds to health checks |
-| Error | Process failed or health check failed |
+| Running  | App responds to health checks                          |
+| Error    | Process failed or health check failed                  |
 
 ## Managing Apps
 
 Use app-management tools rather than editing workspace config by hand:
 
-| Tool | Scope | Keeps Code | Keeps Data | Reversible |
-| --- | --- | --- | --- | --- |
-| `getAppInfo` | All workspaces | Yes | Yes | N/A |
-| `unregisterApp` | Current workspace | Yes | Yes | Yes |
-| `deleteAppData` | Current workspace | Yes | No | No |
-| `deleteApp` | All workspaces | No | No | No |
+| Tool            | Scope             | Keeps Code | Keeps Data | Reversible |
+| --------------- | ----------------- | ---------- | ---------- | ---------- |
+| `getAppInfo`    | All workspaces    | Yes        | Yes        | N/A        |
+| `unregisterApp` | Current workspace | Yes        | Yes        | Yes        |
+| `deleteAppData` | Current workspace | Yes        | No         | No         |
+| `deleteApp`     | All workspaces    | No         | No         | No         |
 
 Check `getAppInfo` before destructive actions so the user understands workspace impact.
 
 ## Hot Reloading
 
-Vite handles client HMR. The Hono server runs in the same app process through the Moldable launcher. The desktop restarts apps when requested by the user or when app lifecycle controls are used.
+Vite handles client HMR. Because Moldable serves apps through Portless `.localhost` routes, `src/server/index.ts` must build Vite's `server.hmr` options from `MOLDABLE_APP_URL` and set `protocol`, `host`, and `clientPort` so the webview opens the HMR websocket through the same public app route.
+
+Server and API changes are handled by `tsx watch` in `scripts/moldable-dev.mjs`. The desktop only needs to restart apps when the user requests lifecycle controls or when the dev script itself changes.
 
 ## Common Operations
 
