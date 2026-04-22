@@ -135,8 +135,9 @@ app.get('/api/moldable/commands', (c) => {
 
 For dynamic lists, return one command per item and use `action.command` to send
 all items to the same client handler with different payloads. `description` is
-shown as muted secondary text and is also searchable. `status: 'modified'`
-renders a small dot next to the command label.
+shown as muted secondary text and is also searchable. `indicator` renders an
+app-defined visual marker next to the command label; include a human-readable
+`label` for accessibility and search.
 
 ```ts
 app.get('/api/moldable/commands', async (c) => {
@@ -148,8 +149,14 @@ app.get('/api/moldable/commands', async (c) => {
       id: `switch-repository:${encodeURIComponent(repo.path)}`,
       label: repo.name,
       description: repo.path,
-      icon: 'folder-git',
-      status: repo.isDirty ? 'modified' : undefined,
+      icon: 'folder',
+      indicator: repo.isDirty
+        ? {
+            type: 'dot',
+            label: 'Has uncommitted changes',
+            color: 'var(--primary)',
+          }
+        : undefined,
       group: 'Repositories',
       action: {
         type: 'message',
@@ -181,7 +188,7 @@ Supported action types:
 - `navigate`: changes the active iframe path.
 - `focus`: shorthand for a focus-target message.
 
-Known icon keys include `plus`, `trash-2`, `filter`, and `folder-git`. Add new
+Known icon keys include `plus`, `trash-2`, `filter`, and `folder`. Add new
 keys to `desktop/src/components/global-command-menu.tsx` when an app needs a
 new Lucide icon.
 
