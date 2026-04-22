@@ -109,7 +109,11 @@ await downloadFile({
 
 ## Commands
 
-Expose app commands from a Hono API route and handle them in the client:
+Apps can add app-specific actions to the desktop Cmd+K menu. The desktop
+fetches commands from the active app's Hono server at
+`GET /api/moldable/commands` and includes the current workspace in the
+`x-moldable-workspace` header. Use `getWorkspaceFromRequest(c.req.raw)` when
+commands depend on workspace-scoped state.
 
 ```ts
 // src/server/app.ts
@@ -121,9 +125,38 @@ app.get('/api/moldable/commands', (c) => {
         label: 'Add New Item',
         shortcut: 'n',
         icon: 'plus',
+        group: 'Actions',
         action: { type: 'message', payload: { action: 'add' } },
       },
     ],
+  })
+})
+```
+
+For dynamic lists, return one command per item and use `action.command` to send
+all items to the same client handler with different payloads. `description` is
+shown as muted secondary text and is also searchable. `status: 'modified'`
+renders a small dot next to the command label.
+
+```ts
+app.get('/api/moldable/commands', async (c) => {
+  const workspaceId = getWorkspaceFromRequest(c.req.raw)
+  const repos = await getRecentRepos(workspaceId)
+
+  return c.json({
+    commands: repos.map((repo) => ({
+      id: `switch-repository:${encodeURIComponent(repo.path)}`,
+      label: repo.name,
+      description: repo.path,
+      icon: 'folder-git',
+      status: repo.isDirty ? 'modified' : undefined,
+      group: 'Repositories',
+      action: {
+        type: 'message',
+        command: 'switch-repository',
+        payload: { repoPath: repo.path },
+      },
+    })),
   })
 })
 ```
@@ -134,9 +167,23 @@ import { useMoldableCommands } from '@moldable-ai/ui'
 function App() {
   useMoldableCommands({
     'add-item': () => setShowAddForm(true),
+    'switch-repository': (payload) => {
+      const repoPath = (payload as { repoPath?: unknown } | null)?.repoPath
+      if (typeof repoPath === 'string') switchRepository(repoPath)
+    },
   })
 }
 ```
+
+Supported action types:
+
+- `message`: posts `moldable:command` to the app iframe.
+- `navigate`: changes the active iframe path.
+- `focus`: shorthand for a focus-target message.
+
+Known icon keys include `plus`, `trash-2`, `filter`, and `folder-git`. Add new
+keys to `desktop/src/components/global-command-menu.tsx` when an app needs a
+new Lucide icon.
 
 ## Widget View
 

@@ -65,9 +65,10 @@ Read these for in-depth guidance:
 
 ### Implementation Patterns
 
-- [references/ui.md](references/ui.md) — **@moldable-ai/ui components**, shadcn/ui, themes, rich text editor
+- [references/ui.md](references/ui.md) — **@moldable-ai/ui components**, shadcn/ui, themes, rich text editor, Cmd+K app commands
 - [references/storage-patterns.md](references/storage-patterns.md) — Filesystem storage, React Query, workspace-aware APIs
 - [references/desktop-apis.md](references/desktop-apis.md) — postMessage APIs (open-url, show-in-folder, set-chat-input, save-file)
+- [references/app-to-app-communication.md](references/app-to-app-communication.md) — App-to-app RPC, capability manifests, workspace-scoped grants, Calendar-owned OAuth/data access
 - [references/skills-mcps.md](references/skills-mcps.md) — Skills library, MCP configuration, custom MCP servers
 
 ## Essential Patterns

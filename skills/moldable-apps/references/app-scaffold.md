@@ -61,7 +61,7 @@ src/server/static.ts
   "visibility": "private",
   "description": "Brief description of what this app does",
   "author": "",
-  "license": "MIT",
+  "license": "FSL-1.1-ALv2",
   "icon": "🚀",
   "widgetSize": "medium",
   "category": "custom",

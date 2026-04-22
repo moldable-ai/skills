@@ -13,7 +13,7 @@ Every app has a `moldable.json` in its root directory:
   "visibility": "private",
   "description": "A brief description of what this app does",
   "author": "",
-  "license": "MIT",
+  "license": "FSL-1.1-ALv2",
   "icon": "🚀",
   "widgetSize": "medium",
   "category": "custom",
