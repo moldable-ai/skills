@@ -137,7 +137,7 @@ For dynamic lists, return one command per item and use `action.command` to send
 all items to the same client handler with different payloads. `description` is
 shown as muted secondary text and is also searchable. `indicator` renders an
 app-defined visual marker next to the command label; include a human-readable
-`label` for accessibility and search.
+`label` for accessibility and hover help.
 
 ```ts
 app.get('/api/moldable/commands', async (c) => {
