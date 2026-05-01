@@ -65,6 +65,7 @@ Read these for in-depth guidance:
 
 ### Implementation Patterns
 
+- [references/design.md](references/design.md) — Moldable app design system for widget views, full app layouts, state handling, density, copy, motion, and UI polish. Read this before visible UI work.
 - [references/ui.md](references/ui.md) — **@moldable-ai/ui components**, shadcn/ui, themes, rich text editor, Cmd+K app commands
 - [references/storage-patterns.md](references/storage-patterns.md) — Filesystem storage, React Query, workspace-aware APIs
 - [references/desktop-apis.md](references/desktop-apis.md) — postMessage APIs (open-url, show-in-folder, set-chat-input, save-file)
@@ -72,6 +73,8 @@ Read these for in-depth guidance:
 - [references/skills-mcps.md](references/skills-mcps.md) — Skills library, MCP configuration, custom MCP servers
 
 ## Essential Patterns
+
+For any visible app UI, read [references/design.md](references/design.md) before editing `src/client/app.tsx`, `src/client/widget.tsx`, or client components. The design reference is self-contained and does not require other apps to be installed.
 
 ### 1. UI Components (@moldable-ai/ui)
 

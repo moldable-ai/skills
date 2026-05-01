@@ -217,3 +217,20 @@ export function Widget() {
 import { Markdown } from '@moldable-ai/ui'
 import { MarkdownEditor } from '@moldable-ai/editor'
 ```
+
+Use `Markdown` for read-only rendered markdown and `MarkdownEditor` for editable markdown/prose. Do not build markdown editors with raw `contenteditable` or a textarea when `@moldable-ai/editor` fits the job.
+
+Import the editor styles in `src/client/globals.css`:
+
+```css
+@import '@moldable-ai/editor/styles';
+@source '../../node_modules/@moldable-ai/editor/dist/**/*.{js,jsx,ts,tsx}';
+```
+
+For code, SQL, JSON, config, scripts, and other syntax-heavy editing, use Monaco through `@monaco-editor/react` instead of a textarea.
+
+```bash
+pnpm add @monaco-editor/react monaco-editor
+```
+
+Use Monaco in a stable-height pane with `height="100%"`, `automaticLayout: true`, Moldable light/dark themes from `useTheme().resolvedTheme`, and semantic Moldable UI for the surrounding toolbar/status/result surfaces. See [design.md](design.md) for the full editor patterns.
