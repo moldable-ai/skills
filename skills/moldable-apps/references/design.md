@@ -48,6 +48,7 @@ If an answer is vague, simplify the app before designing. "Manage items" is too 
 - Respect `--chat-safe-padding` anywhere content or controls can be hidden by the desktop chat.
 - App shells must be full height. Put scrolling on intentional inner regions, not on `body` or an accidental page wrapper.
 - Dialogs and popovers with substantial content must avoid the chat area; constrain their height with `--chat-safe-padding` and scroll their body content internally.
+- Never use native browser confirmations: no `confirm()`, `window.confirm()`, or host/global `.confirm(...)`. Use Moldable/shadcn `AlertDialog` for confirmations.
 
 ## Widget View
 
@@ -722,6 +723,8 @@ Dialog rules:
 - keep header and footer `shrink-0`
 - put `overflow-y-auto` on the dialog body, not the whole page
 - keep destructive confirmations compact, but still verify they do not sit under the chat overlay
+- destructive confirmations must use `AlertDialog`, not `confirm()`, `window.confirm()`, or `.confirm(...)`; native blocking dialogs are unreliable in Moldable desktop webviews and especially inside Radix context-menu/dropdown selection handlers
+- when a destructive action starts from a context menu or dropdown, let the menu selection finish, store the pending target in state, then open the `AlertDialog` with the exact object name or selected count before executing
 - large command/history/import/export dialogs should use `w-[min(...)] max-w-none` plus the same safe max height pattern
 
 Set chat instructions when app state helps the agent:
@@ -998,6 +1001,7 @@ Before finishing UI work, verify:
 - scrolling is on intentional inner panes, not the body
 - all scrollable content clears chat safe padding
 - dialogs with substantial content are height-constrained above the chat area and scroll internally
+- confirmations use `AlertDialog`, never native `confirm()`, `window.confirm()`, or `.confirm(...)`
 - fixed docks clear chat safe padding
 - no raw Tailwind colors
 - no marketing hero, feature-grid, decorative gradient, nested cards, or giant empty centered page
