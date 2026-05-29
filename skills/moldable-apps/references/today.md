@@ -1,8 +1,7 @@
 # Today contribution
 
-Moldable's home screen is the **Today** view (host-rendered). There are **no widget views** —
-apps no longer ship `widget.html` / `src/client/widget.tsx`. Instead, an app participates in the
-home by implementing a single HTTP route that returns what (if anything) needs the user right now.
+Moldable's home screen is the **Today** view (host-rendered). An app participates in the home by
+implementing a single HTTP route that returns what (if anything) needs the user right now.
 
 The golden rule: **silence is the default.** Most of the time most apps return nothing. A card
 appears only when it genuinely earns attention.
@@ -80,7 +79,7 @@ by it across apps.
 - Quiet by default; emit nothing when nothing needs the user.
 - Every item is **actionable or a resume** — never a bare count with no call-to-action.
 - Cap your own output to ~1–2 items; prefer **one summary** over a list.
-- Never mirror the old widget: no always-on lists, recent-item dumps, empty-state nags,
+- Never mirror an always-on overview: no permanent lists, recent-item dumps, empty-state nags,
   routine-success celebrations, stale (> 24h) events, or sync/meta noise.
 
 ## Examples (shipped)

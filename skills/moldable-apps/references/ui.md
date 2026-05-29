@@ -194,10 +194,10 @@ new Lucide icon.
 
 ## Home: the Today view
 
-There are no per-app widget views. The home screen is the host-rendered **Today** view, and an
-app participates by implementing `GET /api/moldable/today` — returning something only when it
-genuinely needs the user (quiet by default). See [today.md](today.md) for the contribution
-contract, return shape, and examples.
+The home screen is the host-rendered **Today** view. An app participates by implementing
+`GET /api/moldable/today` — returning something only when it genuinely needs the user
+(quiet by default). See [today.md](today.md) for the contribution contract, return shape,
+and examples.
 
 ## Markdown And Rich Text
 

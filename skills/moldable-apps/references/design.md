@@ -52,7 +52,7 @@ If an answer is vague, simplify the app before designing. "Manage items" is too 
 
 ## Today Contribution
 
-Moldable's home screen is the host-rendered **Today** view. Apps no longer ship a per-app widget view (`widget.html` / `src/client/widget.tsx`). Instead, an app participates in the home by implementing `GET /api/moldable/today`, which returns `{ items, resume }` only when something genuinely needs the user.
+Moldable's home screen is the host-rendered **Today** view. An app participates in the home by implementing `GET /api/moldable/today`, which returns `{ items, resume }` only when something genuinely needs the user.
 
 The design principles carry straight over from the rest of this file: signal over noise, every surfaced item is actionable or a resume, and **silence is the default** — most apps return nothing most of the time. A Today card is not a teaser or an always-on preview; it earns its place only when the user should act.
 

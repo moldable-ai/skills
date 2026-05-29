@@ -95,10 +95,6 @@ Unlike traditional workspace models that stop/start processes, Moldable keeps al
 }
 ```
 
-> `widget_size` may still appear on older app entries. It is optional legacy metadata
-> (currently unused; retained for compatibility) — there are no per-app widget views.
-> Apps contribute to the host **Today** view instead; see [references/today.md](today.md).
-
 ## Data Isolation
 
 Each workspace has its own data directory for each app:
@@ -143,7 +139,7 @@ import { useWorkspace } from '@moldable-ai/ui'
 
 function MyComponent() {
   const { workspaceId, fetchWithWorkspace } = useWorkspace()
-  
+
   // Include workspaceId in query keys
   const { data } = useQuery({
     queryKey: ['items', workspaceId],
@@ -221,7 +217,7 @@ await writeFile(configPath, JSON.stringify(config, null, 2))
 
 // Create workspace directory
 await mkdir('~/.moldable/workspaces/side-project')
-await writeFile('~/.moldable/workspaces/side-project/config.json', 
+await writeFile('~/.moldable/workspaces/side-project/config.json',
   JSON.stringify({ apps: [] }, null, 2))
 ```
 

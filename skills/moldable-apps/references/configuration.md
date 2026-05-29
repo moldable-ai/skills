@@ -37,14 +37,13 @@ Every app has a `moldable.json` in its root directory:
 | `tags` | No | Array of searchable tags |
 | `moldableDependencies` | No | Required Moldable packages |
 | `env` | No | Required environment variables |
-| `widgetSize` | No (legacy) | `small`, `medium`, or `large`. Currently unused; retained for compatibility — do not build around it. |
 
 ### Surfacing to the home screen
 
-There is no per-app widget view. The home screen is the host-rendered **Today** view. An app
-participates by implementing `GET /api/moldable/today`, which stays quiet by default and returns a
-card only when something genuinely needs the user. The lint check `today-route` (a warning) flags
-apps that don't expose it. See [references/today.md](./today.md) for the contract and examples.
+The home screen is the host-rendered **Today** view. An app participates by implementing
+`GET /api/moldable/today`, which stays quiet by default and returns a card only when something
+genuinely needs the user. The lint check `today-route` (a warning) flags apps that don't expose it.
+See [references/today.md](./today.md) for the contract and examples.
 
 ### Environment Variables
 
@@ -120,7 +119,6 @@ Each workspace has a `config.json` that lists registered apps:
 | `command` | Yes | Command to start the app (`pnpm`, `npm`, `node`) |
 | `args` | Yes | Command arguments (`["dev"]`, `["start"]`) |
 | `requires_port` | No | If `true`, fail if preferred port is busy |
-| `widget_size` | No (legacy) | Currently unused; retained for compatibility |
 
 ### Port Assignment
 

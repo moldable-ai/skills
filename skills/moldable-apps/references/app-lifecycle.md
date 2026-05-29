@@ -41,9 +41,8 @@ moldable.json             # App metadata
 package.json              # Dependencies and scripts
 ```
 
-There is no per-app widget view. An app participates in the home screen by implementing
-`GET /api/moldable/today`, which the host-rendered **Today** view pulls from. See
-[references/today.md](today.md).
+An app participates in the home screen by implementing `GET /api/moldable/today`,
+which the host-rendered **Today** view pulls from. See [references/today.md](today.md).
 
 ## App Startup
 
@@ -116,10 +115,9 @@ Edit `~/.moldable/shared/apps/my-app/src/client/app.tsx`.
 
 ### Contribute to the Home (Today)
 
-Apps no longer ship a widget view. To surface something on the home screen, implement
-`GET /api/moldable/today` in `src/server/app.ts` so the Today view can pull from it. Keep it quiet
-by default — return items only when something genuinely needs the user. See
-[references/today.md](today.md).
+To surface something on the home screen, implement `GET /api/moldable/today` in
+`src/server/app.ts` so the Today view can pull from it. Keep it quiet by default — return
+items only when something genuinely needs the user. See [references/today.md](today.md).
 
 ### Add an API Route
 

@@ -122,10 +122,10 @@ createRoot(document.getElementById("root")!).render(
 
 ### `src/server/app.ts`
 
-The home screen is the host-rendered **Today** view — there is no per-app widget view. An app
-participates by exposing `GET /api/moldable/today`, which returns `{ items, resume }` only when
-something genuinely needs the user (quiet by default). See [references/today.md](today.md) for the
-full contract, item kinds, actions, and signal-vs-noise guidance.
+The home screen is the host-rendered **Today** view. An app participates by exposing
+`GET /api/moldable/today`, which returns `{ items, resume }` only when something genuinely needs
+the user (quiet by default). See [references/today.md](today.md) for the full contract, item kinds,
+actions, and signal-vs-noise guidance.
 
 ```ts
 import { Hono } from "hono";
