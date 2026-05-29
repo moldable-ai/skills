@@ -15,7 +15,6 @@ Every app has a `moldable.json` in its root directory:
   "author": "",
   "license": "FSL-1.1-ALv2",
   "icon": "🚀",
-  "widgetSize": "medium",
   "category": "custom",
   "tags": [],
   "moldableDependencies": {
@@ -33,20 +32,19 @@ Every app has a `moldable.json` in its root directory:
 | `version` | Yes | Semantic version |
 | `description` | Yes | Brief description |
 | `icon` | Yes | Emoji icon for the app |
-| `widgetSize` | No | `small`, `medium`, or `large` (default: `medium`) |
 | `visibility` | No | `private` (default) or `public` |
 | `category` | No | App category: `productivity`, `developer`, `media`, `custom` |
 | `tags` | No | Array of searchable tags |
 | `moldableDependencies` | No | Required Moldable packages |
 | `env` | No | Required environment variables |
+| `widgetSize` | No (legacy) | `small`, `medium`, or `large`. Currently unused; retained for compatibility — do not build around it. |
 
-### Widget Sizes
+### Surfacing to the home screen
 
-| Size | Dimensions | Use Case |
-|------|------------|----------|
-| `small` | 1×1 | Status indicator, quick action |
-| `medium` | 2×1 | Summary + one action |
-| `large` | 2×2 | Rich preview, multiple actions |
+There is no per-app widget view. The home screen is the host-rendered **Today** view. An app
+participates by implementing `GET /api/moldable/today`, which stays quiet by default and returns a
+card only when something genuinely needs the user. The lint check `today-route` (a warning) flags
+apps that don't expose it. See [references/today.md](./today.md) for the contract and examples.
 
 ### Environment Variables
 
@@ -95,7 +93,6 @@ Each workspace has a `config.json` that lists registered apps:
       "path": "/Users/rob/.moldable/shared/apps/scribo",
       "command": "pnpm",
       "args": ["dev"],
-      "widget_size": "medium",
       "requires_port": false
     },
     {
@@ -105,8 +102,7 @@ Each workspace has a `config.json` that lists registered apps:
       "port": 3002,
       "path": "/Users/rob/.moldable/shared/apps/meetings",
       "command": "pnpm",
-      "args": ["dev"],
-      "widget_size": "large"
+      "args": ["dev"]
     }
   ]
 }
@@ -123,8 +119,8 @@ Each workspace has a `config.json` that lists registered apps:
 | `path` | Yes | Absolute path to app source code |
 | `command` | Yes | Command to start the app (`pnpm`, `npm`, `node`) |
 | `args` | Yes | Command arguments (`["dev"]`, `["start"]`) |
-| `widget_size` | No | Widget size override |
 | `requires_port` | No | If `true`, fail if preferred port is busy |
+| `widget_size` | No (legacy) | Currently unused; retained for compatibility |
 
 ### Port Assignment
 
@@ -214,8 +210,7 @@ config.apps.push({
   port: 3010,
   path: '/Users/rob/.moldable/shared/apps/my-app',
   command: 'pnpm',
-  args: ['dev'],
-  widget_size: 'medium'
+  args: ['dev']
 })
 
 // Save

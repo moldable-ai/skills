@@ -37,7 +37,6 @@ scaffoldApp({
   name: "Expense Tracker", // Display name
   icon: "💰", // Emoji icon
   description: "Track expenses and generate reports",
-  widgetSize: "medium", // small, medium, or large
   extraDependencies: {
     // Optional npm packages
     zod: "^3.0.0",
@@ -48,9 +47,12 @@ scaffoldApp({
 **After scaffolding**, customize:
 
 - `src/client/app.tsx` — Main app view
-- `src/client/widget.tsx` — Widget view
-- `src/server/app.ts` or `src/server/routes/` — Hono API routes
+- `src/server/app.ts` or `src/server/routes/` — Hono API routes (including `/api/moldable/health` and `/api/moldable/today`)
 - `src/client/components/` or `src/components/` — React components
+
+### Today contribution
+
+The home screen is the host-rendered **Today** view. Apps participate by implementing `GET /api/moldable/today`, which returns items/resume only when something genuinely needs the user (quiet by default). See [references/today.md](references/today.md).
 
 ## Detailed References
 
@@ -65,7 +67,8 @@ Read these for in-depth guidance:
 
 ### Implementation Patterns
 
-- [references/design.md](references/design.md) — Moldable app design system for widget views, full app layouts, state handling, density, copy, motion, and UI polish. Read this before visible UI work.
+- [references/design.md](references/design.md) — Moldable app design system for full app layouts, state handling, density, copy, motion, and UI polish. Read this before visible UI work.
+- [references/today.md](references/today.md) — The **Today** home view: implementing `GET /api/moldable/today`, item kinds, actions, and the "quiet by default" rules.
 - [references/ui.md](references/ui.md) — **@moldable-ai/ui components**, shadcn/ui, themes, rich text editor, Cmd+K app commands
 - [references/storage-patterns.md](references/storage-patterns.md) — Filesystem storage, React Query, workspace-aware APIs
 - [references/desktop-apis.md](references/desktop-apis.md) — postMessage APIs (open-url, show-in-folder, set-chat-input, save-file)
@@ -74,7 +77,7 @@ Read these for in-depth guidance:
 
 ## Essential Patterns
 
-For any visible app UI, read [references/design.md](references/design.md) before editing `src/client/app.tsx`, `src/client/widget.tsx`, or client components. The design reference is self-contained and does not require other apps to be installed.
+For any visible app UI, read [references/design.md](references/design.md) before editing `src/client/app.tsx` or client components. The design reference is self-contained and does not require other apps to be installed.
 
 ### 1. UI Components (@moldable-ai/ui)
 
@@ -94,7 +97,6 @@ import {
   useTheme,
   Markdown,
   CodeBlock,
-  WidgetLayout,
   downloadFile,
   sendToMoldable,
 } from "@moldable-ai/ui";

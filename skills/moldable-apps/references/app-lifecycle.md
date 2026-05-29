@@ -12,7 +12,6 @@ const result = await scaffoldApp({
   name: "Expense Tracker",
   icon: "💰",
   description: "Track expenses and generate reports",
-  widgetSize: "medium",
   extraDependencies: {
     zod: "^3.0.0",
   },
@@ -23,7 +22,7 @@ const result = await scaffoldApp({
 
 1. Creates the app directory in `~/.moldable/shared/apps/{appId}/`.
 2. Copies the Vite + Hono template.
-3. Substitutes placeholders for app id, name, icon, description, and widget size.
+3. Substitutes placeholders for app id, name, icon, and description.
 4. Runs `pnpm install`.
 5. Registers the app with a route name in workspace config.
 6. Returns the ready-to-edit app.
@@ -34,14 +33,17 @@ Customize these files:
 
 ```text
 src/client/app.tsx        # Full view
-src/client/widget.tsx     # Widget view
 src/client/components/    # React components
-src/server/app.ts         # Hono app and route registration
+src/server/app.ts         # Hono app and route registration (incl. GET /api/moldable/today)
 src/server/routes/        # API route modules
 src/server/moldable.ts    # Moldable API helpers
 moldable.json             # App metadata
 package.json              # Dependencies and scripts
 ```
+
+There is no per-app widget view. An app participates in the home screen by implementing
+`GET /api/moldable/today`, which the host-rendered **Today** view pulls from. See
+[references/today.md](today.md).
 
 ## App Startup
 
@@ -112,9 +114,12 @@ Server and API changes are handled by `tsx watch` in `scripts/moldable-dev.mjs`.
 
 Edit `~/.moldable/shared/apps/my-app/src/client/app.tsx`.
 
-### Modify Widget View
+### Contribute to the Home (Today)
 
-Edit `~/.moldable/shared/apps/my-app/src/client/widget.tsx`.
+Apps no longer ship a widget view. To surface something on the home screen, implement
+`GET /api/moldable/today` in `src/server/app.ts` so the Today view can pull from it. Keep it quiet
+by default — return items only when something genuinely needs the user. See
+[references/today.md](today.md).
 
 ### Add an API Route
 

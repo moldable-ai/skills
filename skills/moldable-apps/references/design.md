@@ -2,7 +2,7 @@
 
 Use this reference before building or changing visible Moldable app UI. It is intentionally prescriptive so agents with weaker design instincts can still produce apps that feel native to Moldable.
 
-Do not exclusively depend on example apps being installed. This file embeds the patterns to copy, but when Mail, Meetings, or DB Browser are present in `~/.moldable/shared/apps/` or `~/moldable-apps/`, inspect their widget and main app UI before making comparable design changes.
+Do not exclusively depend on example apps being installed. This file embeds the patterns to copy, but when Mail, Meetings, or DB Browser are present in `~/.moldable/shared/apps/` or `~/moldable-apps/`, inspect their main app UI before making comparable design changes.
 
 ## Product Feel
 
@@ -10,8 +10,8 @@ Moldable apps should feel like local, personal instruments: fast, quiet, specifi
 
 The best Moldable app usually has:
 
-- a widget that answers one glanceable question
 - a full view organized around one primary workflow
+- a quiet [Today contribution](today.md) that surfaces on the home screen only when something genuinely needs the user
 - compact chrome that stays close to the object being manipulated
 - real loading, empty, error, auth, permission, and background-activity states
 - clear AI context for the desktop chat when the app has useful state
@@ -23,7 +23,7 @@ Before editing UI files, write these answers in your working notes:
 
 1. **Primary job:** What does this app help the user do in one sentence?
 2. **Primary object:** What is the app's core object: message, meeting, row, file, note, task, event, recipe, clip, connection?
-3. **Widget promise:** What can the widget truthfully show in 1-2 seconds?
+3. **Today trigger:** When (if ever) does this app genuinely need the user on the home screen? See [today.md](today.md). Default to silence.
 4. **Full-view shape:** Choose one layout archetype from this file.
 5. **State inventory:** Name the empty, loading, error, auth, permission, and busy states.
 6. **Chat clearance:** Which scroll areas and fixed controls must respect `--chat-safe-padding`?
@@ -39,7 +39,7 @@ If an answer is vague, simplify the app before designing. "Manage items" is too 
 - Do not use raw Tailwind color families like `bg-gray-100`, `text-zinc-900`, `bg-blue-500`.
 - Do not create a marketing landing page as the first screen.
 - Do not use visible instructional copy to explain obvious UI features.
-- Do not put the app name in the widget body or main app content. Moldable already shows the active app name in desktop chrome and the widget frame.
+- Do not put the app name in the main app content. Moldable already shows the active app name in desktop chrome.
 - Do not add a separate chat input, chat panel, prompt box, or assistant conversation inside an app. Moldable already has desktop chat.
 - Do not wrap the whole app in cards. Use full-height surfaces, panes, lists, editors, and toolbars.
 - Do not nest cards.
@@ -50,154 +50,13 @@ If an answer is vague, simplify the app before designing. "Manage items" is too 
 - Dialogs and popovers with substantial content must avoid the chat area; constrain their height with `--chat-safe-padding` and scroll their body content internally.
 - Never use native browser confirmations: no `confirm()`, `window.confirm()`, or host/global `.confirm(...)`. Use Moldable/shadcn `AlertDialog` for confirmations.
 
-## Widget View
+## Today Contribution
 
-The widget is a live instrument, not a teaser. It should show real app state and remain useful at small sizes.
+Moldable's home screen is the host-rendered **Today** view. Apps no longer ship a per-app widget view (`widget.html` / `src/client/widget.tsx`). Instead, an app participates in the home by implementing `GET /api/moldable/today`, which returns `{ items, resume }` only when something genuinely needs the user.
 
-### Widget Responsibilities
+The design principles carry straight over from the rest of this file: signal over noise, every surfaced item is actionable or a resume, and **silence is the default** — most apps return nothing most of the time. A Today card is not a teaser or an always-on preview; it earns its place only when the user should act.
 
-Every widget must handle:
-
-- loading
-- empty data
-- error with retry when retry is possible
-- disconnected/auth-required state when relevant
-- real data preview when data exists
-
-The widget should usually include one compact status/scope row plus a preview body. If the widget is extremely small, omit the header and let the rows carry the meaning. Do not title the widget with the app name; the Moldable widget frame already shows it.
-
-### Widget Density
-
-Use these defaults:
-
-- outer padding: `p-2` or `p-3`
-- row padding: `px-2.5 py-1.5`
-- row radius: `rounded-md`
-- title text: `text-[12px]` or `text-sm`
-- meta text: `text-[10px]` or `text-[11px]`
-- row gap: `space-y-1`
-- preview count: 3-6 rows depending on row height
-- icons/dots: `size-2` to `size-3.5`
-
-Widgets should feel compact enough that four messages, five meetings, or six database connections can fit without looking cramped.
-
-### Widget Identity
-
-The Moldable widget frame already shows the app icon and app name. Inside the widget, use labels for the current data scope or state, not the app identity.
-
-Good widget labels:
-
-- "Inbox"
-- "3 unread"
-- "Recent"
-- "Recording"
-- "Connected"
-- "No rows"
-- "Today"
-
-Bad widget labels:
-
-- repeating the app name, such as "Images" inside the Images widget
-- repeating the app icon next to the app name
-- a large branded header that consumes preview space
-- "Welcome to [App Name]"
-
-### Widget Recipes
-
-**Recent object list**
-
-Use for mail, meetings, notes, tasks, files, records.
-
-Structure:
-
-- optional status/scope row with icon, scope label, and small count/status
-- `min-h-0 flex-1 overflow-hidden`
-- `ul` or stacked rows
-- each row has a primary label, one metadata line, and optional status dot/icon
-- rows are not full buttons unless clicking specific rows is supported by the host; otherwise the widget itself opens the app
-
-Visual pattern:
-
-```tsx
-<div className="bg-background flex h-full flex-col overflow-hidden p-2">
-  <div className="mb-2 flex shrink-0 items-center justify-between px-1">
-    <div className="flex min-w-0 items-center gap-2">
-      <Icon className="text-muted-foreground size-3.5 shrink-0" />
-      <h2 className="truncate text-sm font-semibold">Inbox</h2>
-    </div>
-    <span className="text-muted-foreground shrink-0 text-[11px] font-medium">
-      3 unread
-    </span>
-  </div>
-  <div className="min-h-0 flex-1 space-y-1 overflow-hidden">
-    {items.slice(0, 4).map((item) => (
-      <div className="bg-muted/45 flex min-w-0 items-start gap-2 rounded-md px-2.5 py-1.5">
-        <span className="bg-primary mt-1.5 size-2 shrink-0 rounded-full" />
-        <div className="min-w-0 flex-1">
-          <div className="flex min-w-0 items-center justify-between gap-2">
-            <p className="truncate text-[12px] font-semibold leading-4">{item.title}</p>
-            <span className="text-muted-foreground shrink-0 text-[10px] leading-4">{item.time}</span>
-          </div>
-          <p className="text-muted-foreground truncate text-[10px] leading-4">{item.meta}</p>
-        </div>
-      </div>
-    ))}
-  </div>
-</div>
-```
-
-**Live status widget**
-
-Use for recording, syncing, importing, running jobs, timers, playback.
-
-Structure:
-
-- one primary status row
-- one large but not oversized status/control cluster
-- small meter/timer/progress element
-- one clear primary action
-
-Avoid a giant empty center with one button. Show state, duration, last item, or next action.
-
-**Empty widget with ghost examples**
-
-Use ghost rows to teach shape without long copy. Ghost examples should look like disabled future data: low opacity, grayscale, semantic borders, no bright colors.
-
-```tsx
-<div className="bg-background flex h-full flex-col overflow-hidden p-2">
-  <div className="min-h-0 flex-1 space-y-1 overflow-hidden">
-    {GHOST_EXAMPLES.map((item) => (
-      <div className="border-border/40 bg-muted/20 rounded-md border px-2.5 py-1.5 opacity-45 grayscale">
-        <div className="truncate text-[12px] font-semibold leading-4">{item.title}</div>
-        <div className="text-muted-foreground truncate text-[10px] leading-4">{item.meta}</div>
-      </div>
-    ))}
-  </div>
-  <div className="border-border/50 bg-muted/20 mt-2 flex shrink-0 items-center gap-2 rounded-lg border px-2.5 py-2">
-    <span className="bg-background text-muted-foreground flex size-7 shrink-0 items-center justify-center rounded-md">
-      <Icon className="size-3.5" />
-    </span>
-    <div className="min-w-0">
-      <div className="truncate text-[12px] font-semibold">Add the first item</div>
-      <div className="text-muted-foreground truncate text-[10px]">It will appear here.</div>
-    </div>
-  </div>
-</div>
-```
-
-### Widget Anti-Patterns
-
-Do not build widgets with:
-
-- app name repeated inside the widget content
-- duplicate app icon plus app name headers
-- big centered emoji plus paragraph copy
-- marketing headlines
-- feature lists
-- more than one primary action
-- charts too small to read
-- controls that require precision below 44px when they are the main action
-- scrollbars unless the widget is intentionally a compact list and the overflow is still readable
+The full contract — the endpoint shape, `TodayItem` fields, item kinds, action types, `ResumeState`, ranking, and shipped examples — lives in [today.md](today.md). Read it before adding a Today route.
 
 ## Full View Layout Archetypes
 
@@ -825,8 +684,6 @@ Default:
 
 Scale:
 
-- widget meta: `text-[10px]` to `text-[11px]`
-- widget primary: `text-[12px]` to `text-sm`
 - app chrome: `text-xs` to `text-sm`
 - row primary: `text-[13px]` to `text-sm`
 - document body: `text-[1.0625rem]` to `text-[1.375rem]`
@@ -927,18 +784,11 @@ Design rules:
 
 ## Embedded Reference Patterns
 
-Use these as style targets even when the example apps are not installed. If Mail, Meetings, or DB Browser are installed, read the relevant `src/client/widget.tsx`, `src/client/app.tsx`, and component files directly and prefer the live code over this compressed summary.
+Use these as style targets even when the example apps are not installed. If Mail, Meetings, or DB Browser are installed, read the relevant `src/client/app.tsx` and component files directly and prefer the live code over this compressed summary.
 
 ### Mail-Like Pattern
 
 Use when the app is about triage.
-
-Widget:
-
-- title row: icon, "Inbox" or object name, count text
-- 3-4 rows
-- each row: unread dot, sender/title, subject/meta, time
-- empty: ghost rows plus "Inbox empty" style footer
 
 Full view:
 
@@ -953,11 +803,6 @@ Full view:
 
 Use when the app has live capture plus notes.
 
-Widget:
-
-- recent meetings list with title, relative time, duration
-- empty ghost meetings plus one-line "No meetings yet" message
-
 Full view:
 
 - "Coming up" or next scheduled objects first when relevant
@@ -971,12 +816,6 @@ Full view:
 ### DB-Browser-Like Pattern
 
 Use when the app is a technical instrument.
-
-Widget:
-
-- 4-6 compact rows
-- colored dot, connection/object name, mono metadata
-- empty ghost connections plus "Add a connection" footer
 
 Full view:
 
@@ -993,8 +832,6 @@ Full view:
 
 Before finishing UI work, verify:
 
-- widget has real loading, empty, error, and data states
-- widget does not repeat the app name or duplicate the app icon/title chrome
 - full view uses one archetype from this file
 - full view does not add an app-name header just to identify the app
 - app shell is full height with `h-full min-h-0 overflow-hidden`

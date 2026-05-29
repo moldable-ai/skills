@@ -192,24 +192,12 @@ Known icon keys include `plus`, `trash-2`, `filter`, and `folder`. Add new
 keys to `desktop/src/components/global-command-menu.tsx` when an app needs a
 new Lucide icon.
 
-## Widget View
+## Home: the Today view
 
-`src/client/widget.tsx` should render compact, glanceable content. Include `GHOST_EXAMPLES` for empty-state consistency and use touch-friendly targets.
-
-```tsx
-const GHOST_EXAMPLES = [
-  { text: 'First item', icon: '📝' },
-  { text: 'Second item', icon: '✨' },
-]
-
-export function Widget() {
-  return (
-    <div className="flex h-full flex-col p-2">
-      {/* compact widget content */}
-    </div>
-  )
-}
-```
+There are no per-app widget views. The home screen is the host-rendered **Today** view, and an
+app participates by implementing `GET /api/moldable/today` — returning something only when it
+genuinely needs the user (quiet by default). See [today.md](today.md) for the contribution
+contract, return shape, and examples.
 
 ## Markdown And Rich Text
 

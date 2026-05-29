@@ -89,12 +89,15 @@ Unlike traditional workspace models that stop/start processes, Moldable keeps al
       "port": 3001,
       "path": "/Users/rob/.moldable/shared/apps/todo",
       "command": "pnpm",
-      "args": ["dev"],
-      "widget_size": "medium"
+      "args": ["dev"]
     }
   ]
 }
 ```
+
+> `widget_size` may still appear on older app entries. It is optional legacy metadata
+> (currently unused; retained for compatibility) — there are no per-app widget views.
+> Apps contribute to the host **Today** view instead; see [references/today.md](today.md).
 
 ## Data Isolation
 

@@ -10,14 +10,12 @@ Every Moldable app must live in `~/.moldable/shared/apps/{app-id}/` and include:
 moldable.json
 package.json
 index.html
-widget.html
 vite.config.ts
 eslint.config.js
 tsconfig.json
 scripts/moldable-dev.mjs
 src/client/main.tsx
 src/client/app.tsx
-src/client/widget.tsx
 src/client/globals.css
 src/client/query-provider.tsx
 src/server/index.ts
@@ -32,7 +30,7 @@ src/server/static.ts
 | ------------------------- | -------- | -------------------------------------------------------------------------------------------- |
 | `moldable-json-exists`    | Error    | `moldable.json` must exist                                                                   |
 | `moldable-json-valid`     | Error    | Manifest must be valid JSON                                                                  |
-| `moldable-json-fields`    | Error    | Manifest must include `name`, `icon`, `description`, `widgetSize`                            |
+| `moldable-json-fields`    | Error    | Manifest must include `name`, `icon`, `description`                                          |
 | `moldable-json-runtime`   | Error    | Manifest runtime must be `vite_hono`                                                         |
 | `vite-config-exists`      | Error    | `vite.config.ts` must exist                                                                  |
 | `hono-server-entry`       | Error    | `src/server/index.ts` must exist                                                             |
@@ -40,8 +38,7 @@ src/server/static.ts
 | `moldable-dev-script`     | Error    | `scripts/moldable-dev.mjs` must exist                                                        |
 | `moldable-dev-syntax`     | Error    | Dev script must launch the Hono server with `tsx watch` and track `.moldable.instances.json` |
 | `package-json-dev-script` | Error    | `dev` script must use `node ./scripts/moldable-dev.mjs`                                      |
-| `widget-file`             | Error    | `src/client/widget.tsx` must exist                                                           |
-| `widget-ghost-state`      | Warning  | Widget should include `GHOST_EXAMPLES`                                                       |
+| `today-route`             | Warning  | `src/server/app.ts` should expose `GET /api/moldable/today` (contributes to the Today view)  |
 | `health-route`            | Error    | `src/server/app.ts` must expose `/api/moldable/health`                                       |
 | `gitignore-valid`         | Error    | `.gitignore` must ignore `dist` and `node_modules`                                           |
 | `eslint-config-app`       | Error    | `eslint.config.js` must use `@moldable-ai/eslint-config/app`                                 |
@@ -63,7 +60,6 @@ src/server/static.ts
   "author": "",
   "license": "FSL-1.1-ALv2",
   "icon": "🚀",
-  "widgetSize": "medium",
   "category": "custom",
   "tags": [],
   "moldableDependencies": {
@@ -124,21 +120,12 @@ createRoot(document.getElementById("root")!).render(
 );
 ```
 
-### `src/client/widget.tsx`
-
-```tsx
-const GHOST_EXAMPLES = [
-  { text: "First example item", icon: "📝" },
-  { text: "Second example item", icon: "✨" },
-  { text: "Third example item", icon: "🎯" },
-];
-
-export function Widget() {
-  return <div className="flex h-full flex-col p-2">{/* Widget content */}</div>;
-}
-```
-
 ### `src/server/app.ts`
+
+The home screen is the host-rendered **Today** view — there is no per-app widget view. An app
+participates by exposing `GET /api/moldable/today`, which returns `{ items, resume }` only when
+something genuinely needs the user (quiet by default). See [references/today.md](today.md) for the
+full contract, item kinds, actions, and signal-vs-noise guidance.
 
 ```ts
 import { Hono } from "hono";
@@ -153,6 +140,13 @@ app.get("/api/moldable/health", (c) => {
     appId: process.env.MOLDABLE_APP_ID ?? "my-app",
     status: "ok",
   });
+});
+
+// Contribute to the Today home view. Return nothing when nothing needs the user.
+app.get("/api/moldable/today", (c) => {
+  const items: unknown[] = []; // push only when something earns attention
+  const resume: unknown = null; // "pick up where you left off", or null
+  return c.json({ items, resume, generatedAt: new Date().toISOString() });
 });
 ```
 
