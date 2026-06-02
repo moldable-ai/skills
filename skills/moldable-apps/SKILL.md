@@ -71,6 +71,7 @@ Read these for in-depth guidance:
 - [references/today.md](references/today.md) — The **Today** home view: implementing `GET /api/moldable/today`, item kinds, actions, and the "quiet by default" rules.
 - [references/ui.md](references/ui.md) — **@moldable-ai/ui components**, shadcn/ui, themes, rich text editor, Cmd+K app commands
 - [references/storage-patterns.md](references/storage-patterns.md) — Filesystem storage, React Query, workspace-aware APIs
+- [references/browser-storage-audit.md](references/browser-storage-audit.md) — Current browser storage usage and migration guidance
 - [references/desktop-apis.md](references/desktop-apis.md) — postMessage APIs (open-url, show-in-folder, set-chat-input, save-file)
 - [references/app-to-app-communication.md](references/app-to-app-communication.md) — App-to-app RPC, capability manifests, workspace-scoped grants, Calendar-owned OAuth/data access
 - [references/skills-mcps.md](references/skills-mcps.md) — Skills library, MCP configuration, custom MCP servers
@@ -242,7 +243,7 @@ await runCommand({
 ## Common Mistakes to Avoid
 
 1. **❌ Creating apps manually** — Always use `scaffoldApp`
-2. **❌ Using localStorage** — Use filesystem storage
+2. **❌ Using localStorage/sessionStorage for app data or settings** — Use workspace-scoped server APIs and `@moldable-ai/storage`; browser storage is only acceptable for disposable same-session UI state.
 3. **❌ Forgetting workspaceId** — Include in query keys and API calls
 4. **❌ Hardcoding paths** — Use `getAppDataDir()` for portability
 5. **❌ Using raw colors** — Use shadcn semantic colors (`bg-background`, not `bg-gray-100`)

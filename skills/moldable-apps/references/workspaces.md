@@ -288,5 +288,5 @@ const mutation = useMutation({
 2. **Include workspaceId in query keys** for cache isolation
 3. **Use fetchWithWorkspace** for all API calls
 4. **Clear app-specific state** on workspace change
-5. **Don't store workspace data in localStorage** — use filesystem
+5. **Don't store workspace data or workspace preferences in browser storage** — use workspace-scoped filesystem storage through app server APIs
 6. **Test with multiple workspaces** to ensure isolation

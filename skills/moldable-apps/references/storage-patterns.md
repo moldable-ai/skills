@@ -5,10 +5,25 @@ Moldable is local-first and workspace-based. Apps must isolate data per workspac
 ## Principles
 
 1. Persist to the filesystem through server APIs.
-2. Do not use `localStorage` or `sessionStorage` for durable app data.
+2. Do not use `localStorage` or `sessionStorage` for durable app data, user preferences, workspace settings, caches, OAuth state, secrets, or anything that should survive as part of a workspace.
 3. Use `@moldable-ai/storage` helpers on the server.
 4. Use `fetchWithWorkspace` on the client.
 5. Include `workspaceId` in React Query keys.
+
+## Browser Storage Anti-Pattern
+
+Treat browser storage as host-private implementation detail, not app storage. Moldable apps run inside desktop webviews while the desktop owns workspace routing and data isolation. Anything stored in `localStorage` persists outside the app's workspace data directory, is invisible to Git-native backups, cannot be inspected or migrated by app RPC, and can silently diverge from server state.
+
+Do not use browser storage for:
+
+- workspace-specific settings such as selected view mode, selected instrument, selected provider, or other preferences
+- app-owned data such as favorites, streaks, drafts, generated assets, documents, cache records, or indexes
+- API keys, OAuth state, tokens, or other secrets
+- durable client caches of server data
+
+Use app server routes backed by `getAppDataDir(workspaceId)` instead. Client code should load those settings/data with `fetchWithWorkspace` and React Query keys that include `workspaceId`.
+
+The only acceptable browser storage use is disposable UI state that does not need backup, sync, migration, RPC access, or cross-session durability. Prefer React state for this. If state should survive app reloads or workspace switches, it belongs in workspace-scoped app storage.
 
 ## Data Directory
 

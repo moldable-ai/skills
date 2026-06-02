@@ -42,7 +42,7 @@ src/server/static.ts
 | `health-route`            | Error    | `src/server/app.ts` must expose `/api/moldable/health`                                       |
 | `gitignore-valid`         | Error    | `.gitignore` must ignore `dist` and `node_modules`                                           |
 | `eslint-config-app`       | Error    | `eslint.config.js` must use `@moldable-ai/eslint-config/app`                                 |
-| `no-localstorage`         | Warning  | Use filesystem storage, not browser storage                                                  |
+| `no-localstorage`         | Warning  | Browser storage is an anti-pattern for app data/settings; use workspace-scoped server storage |
 | `workspace-provider`      | Error    | Client entry must use `WorkspaceProvider`                                                    |
 | `app-registered`          | Error    | App must be registered in workspace `config.json`                                            |
 
@@ -208,4 +208,6 @@ Expose `GET /api/moldable/health` from the Hono app and return the running `appI
 
 ### Browser Storage
 
-Do not use `localStorage` or `sessionStorage` for app data. Persist via server APIs and `@moldable-ai/storage`.
+Do not use `localStorage` or `sessionStorage` for app data, user preferences, workspace settings, durable caches, OAuth state, or secrets. Persist via server APIs and `@moldable-ai/storage`.
+
+Use `getAppDataDir(workspaceId)` for every value that should survive reloads, participate in backups, be visible to app RPC, or stay isolated per workspace. `sessionStorage` is acceptable only for disposable same-session UI state that can be lost without changing app behavior.
