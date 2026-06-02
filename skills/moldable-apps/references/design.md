@@ -35,6 +35,7 @@ If an answer is vague, simplify the app before designing. "Manage items" is too 
 
 - Use `@moldable-ai/ui` components and semantic colors.
 - Use Lucide icons for icon buttons.
+- Do not use the sparkle icon (Lucide `Sparkles` / ✨) as a generic "this is AI" marker. Every AI feature defaulting to a sparkle is meaningless and dated. Choose an icon that names the actual action — e.g. `Paintbrush`/`Palette`/`SwatchBook` for restyling or browsing styles, `Wand2` for a one-off edit/cleanup, `Languages` for translate, `Loader2` (spinning) for in-progress generation. Reserve a sparkle only when "make this sparkle/enhance" is literally the action, and even then prefer a more specific verb+icon.
 - All clickable `<button>` elements include `cursor-pointer` unless disabled.
 - Do not use raw Tailwind color families like `bg-gray-100`, `text-zinc-900`, `bg-blue-500`.
 - Do not create a marketing landing page as the first screen.
@@ -750,7 +751,8 @@ Avoid:
 
 - separate "AI magic" pages
 - in-app assistant/chat panels or prompt bars
-- giant sparkle buttons
+- sparkle icons (`Sparkles` / ✨) used as a stand-in for "AI" — name the action and pick an icon that describes it (paintbrush/palette to restyle, wand for a quick edit, a spinner while generating); never slap a sparkle on every generative button
+- giant or sparkle-laden primary buttons
 - non-editable generated reports
 - unexplained background changes
 - replacing user content without preserving control
