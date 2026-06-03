@@ -38,6 +38,7 @@ curl -fsSL https://aivault.moldable.sh/install.sh | sh
    - `aivault capability describe openai/chat-completions`
 4. Invoke through policy boundary:
    - `aivault invoke openai/chat-completions --body '{"model":"gpt-5.2","messages":[{"role":"user","content":"hello"}]}'`
+   - For long-running streamed calls, add a millisecond timeout such as `--timeout-ms 420000`.
 5. Verify audit trail:
    - `aivault audit`
 

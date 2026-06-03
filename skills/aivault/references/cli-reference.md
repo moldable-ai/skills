@@ -88,6 +88,7 @@ aivault capability bindings --capability openai/chat-completions
 ```bash
 aivault invoke openai/chat-completions --body '{"model":"gpt-5.2","messages":[{"role":"user","content":"hello"}]}'
 aivault invoke openai/transcription --multipart-field model=whisper-1 --multipart-file file=/tmp/audio.wav
+aivault invoke openai/codex-responses --stream --timeout-ms 420000 --method POST --path /responses --body-file-path /tmp/body.json
 
 aivault json openai/chat-completions --body '{"model":"gpt-5.2","messages":[{"role":"user","content":"hello"}]}'
 aivault markdown openai/chat-completions --body '{"model":"gpt-5.2","messages":[{"role":"user","content":"hello"}]}'
@@ -99,9 +100,10 @@ Important invoke options:
 - `--body`, `--body-file-path`
 - `--request`, `--request-file`
 - `--multipart-field`, `--multipart-file`
+- `--stream`
+- `--timeout-ms` for long-running upstream calls, in milliseconds
 - `--credential`
 - `--workspace-id`, `--group-id`
 - `--client-ip`
 
 Upstream auth-class response headers are stripped in all output modes.
-
