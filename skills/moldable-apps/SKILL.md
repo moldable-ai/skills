@@ -1,6 +1,6 @@
 ---
 name: moldable
-description: Complete guide for building Moldable apps. Use this skill when creating new apps with scaffoldApp, modifying existing apps, implementing workspace-aware storage, integrating with the Moldable desktop via postMessage APIs (moldable:show-in-folder, moldable:set-chat-input, moldable:set-chat-instructions, moldable:save-file), configuring workspaces, managing skills/MCPs, or troubleshooting app issues. Essential for any Moldable app development task.
+description: Complete guide for building Moldable apps. Use this skill when creating new apps with scaffoldApp, modifying existing apps, implementing workspace-aware storage, integrating with the Moldable desktop via postMessage APIs (moldable:show-in-folder, moldable:set-chat-input, moldable:set-chat-instructions, moldable:save-file), publishing public unlisted web artifacts through Moldable Artifacts, configuring workspaces, managing skills/MCPs, or troubleshooting app issues. Essential for any Moldable app development task.
 ---
 
 # Moldable App Development
@@ -72,7 +72,8 @@ Read these for in-depth guidance:
 - [references/ui.md](references/ui.md) — **@moldable-ai/ui components**, shadcn/ui, themes, rich text editor, Cmd+K app commands
 - [references/storage-patterns.md](references/storage-patterns.md) — Filesystem storage, React Query, workspace-aware APIs
 - [references/browser-storage-audit.md](references/browser-storage-audit.md) — Current browser storage usage and migration guidance
-- [references/desktop-apis.md](references/desktop-apis.md) — postMessage APIs (open-url, show-in-folder, set-chat-input, save-file)
+- [references/desktop-apis.md](references/desktop-apis.md) — postMessage APIs (open-url, show-in-folder, set-chat-input, save-file, artifact publish)
+- [references/artifact-publishing.md](references/artifact-publishing.md) — Publishing public unlisted HTML/CSS/asset bundles through Moldable Artifacts
 - [references/app-to-app-communication.md](references/app-to-app-communication.md) — App-to-app RPC, capability manifests, workspace-scoped grants, Calendar-owned OAuth/data access
 - [references/skills-mcps.md](references/skills-mcps.md) — Skills library, MCP configuration, custom MCP servers
 
@@ -173,6 +174,11 @@ window.parent.postMessage(
   "*",
 );
 ```
+
+For public, shareable static outputs such as slides, meeting notes, reports,
+HTML/CSS demos, image galleries, or generated app snapshots, prefer
+`publishMoldableArtifact()` from `@moldable-ai/ui` instead of hand-rolled
+network calls. See [references/artifact-publishing.md](references/artifact-publishing.md).
 
 ### 4. Layout Setup
 

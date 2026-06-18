@@ -103,6 +103,27 @@ window.addEventListener('message', (event) => {
 
 **Use case**: Export transcripts, recordings, reports, or any user data.
 
+### moldable:artifact-publish
+
+Publish a public, unlisted static artifact through the Moldable desktop host.
+Prefer the `publishMoldableArtifact()` helper from `@moldable-ai/ui`; it wraps
+this postMessage protocol, passes local source file references to desktop, waits
+for the response, and surfaces errors.
+
+Use artifact publishing for HTML/CSS slides, meeting notes, reports, image
+galleries, or exported static bundles that the user wants to share at a stable
+URL. Do not call `https://artifacts.moldable.sh` directly from app code. The app
+never receives service credentials; Moldable desktop owns the publishing key and
+signs remote requests.
+
+Files are referenced by `sourcePath`; do not send file bytes through
+postMessage. Source files must be staged under the caller app's workspace data
+`publish/` directory. Desktop canonicalizes every source path and rejects files,
+symlinks, or traversal attempts that resolve outside that staging tree.
+
+See [artifact-publishing.md](artifact-publishing.md) for the full workflow,
+security model, and examples.
+
 ## Security Notes
 
 - Messages are only accepted from `http://127.0.0.1:*` and `http://localhost:*` origins
