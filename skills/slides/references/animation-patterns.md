@@ -7,7 +7,18 @@ automatically, `prefers-reduced-motion` handled). You do **not** wire up scroll
 observers, `.visible` toggles, or stage JS — the controller does that.
 
 So this file is just taste: match the *feeling* to the deck, and reach for
-bespoke CSS only when the built-in reveal isn't enough. Keep all motion CSS-only.
+bespoke CSS only when the built-in reveal isn't enough. Keep decorative motion
+CSS-only. Use the optional runtime for meaningful behavior—not for reproducing
+the controller or adding gratuitous animation. See
+[interactive-runtime.md](interactive-runtime.md).
+
+For staged narrative reveals, prefer the controller's built-in convention:
+
+```html
+<p data-build="1">First implication</p>
+<p data-build="2">Recommended action</p>
+<button data-deck-advance>Reveal analysis →</button>
+```
 
 ## Effect → feeling
 

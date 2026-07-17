@@ -1,6 +1,6 @@
 # Style Library
 
-The Slides app ships a library of **studio-grade styles** (47 at last count) — each
+The Slides and Artifacts apps ship an evolving library of **studio-grade styles** — each
 a complete, fully-filled-in sample deck with its own design language, fonts,
 tokens, and signature decoration. A deck's whole look comes from its style, and
 every slide is composed from ONE shared component vocabulary that every style
@@ -15,14 +15,19 @@ only drift if it copied them.
 ## How the style reaches you (the agent)
 
 - **When a deck is open**, the app injects that deck's full **coding guide** —
-  fonts, design tokens, the complete component vocabulary, and style-specific
-  notes — into your system prompt under "App-Provided Context." Author from those
-  classes and `var(--…)` tokens; never hardcode fonts or colors.
+  fonts, design tokens, the complete component vocabulary, optional runtime
+  conventions, and style-specific notes — into your system prompt under
+  "App-Provided Context." Author from those classes and `var(--…)` tokens;
+  never hardcode fonts or colors.
 - **To browse or pick**, call `slides.templates.list` for the catalog
   (`{ id, name, tagline, categories, audiences, description }`) and
   `slides.templates.get { templateId }` for any style's full guide on demand.
 - **The user can also pick visually** in the app's template gallery at deck
   creation.
+- In Artifacts, use `artifacts.templates.list/get` and `artifacts.applyTemplate`.
+  Page and deck templates share the catalog; check each template's `kind`.
+- Template detail includes `runtime` when a deck sample has working behavior.
+  Preserve it when cloning or adapting that template.
 
 ## Choosing a style
 
@@ -51,3 +56,8 @@ tables, CSS charts `.donut`/`.bars`, diagrams `.flow`/`.timeline`, image layouts
 it and stay on-brand. Only write bespoke CSS when a slide genuinely needs
 something outside the kit — bespoke slides won't auto-re-skin when the style
 changes, so prefer the vocabulary. See [authoring-contract.md](authoring-contract.md).
+
+`data-dashboard` is also the reference for an interactive template: filters,
+sorting, a scenario calculator, and staged results implemented through the
+optional deck runtime. When reviewing or creating interactive templates, use
+[interactive-runtime.md](interactive-runtime.md) as the contract.

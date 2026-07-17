@@ -1,8 +1,12 @@
-# Slides RPC API
+# Slides & Artifacts RPC API
 
 The Slides app exposes a JSON-RPC-style dispatch endpoint plus matching REST
 routes. Prefer RPC for authoring; both read/write the same workspace-scoped deck
 files, and the open app window updates live after any change.
+
+Artifacts exposes the same deck authoring model under the `artifacts.*`
+namespace, plus full responsive pages. Use the app that owns the artifact the
+user is editing; do not copy its data into the other app just to author it.
 
 ## Calling RPC
 
@@ -31,14 +35,16 @@ curl -s -H 'x-moldable-workspace-id: <ws>' \
 | Method | Params | Returns |
 | ------ | ------ | ------- |
 | `slides.decks.list` | — | deck summaries |
-| `slides.decks.get` | `id` | full deck (theme + slides) |
-| `slides.decks.create` | `title?, subtitle?, density?, theme?, slides?` | new deck |
-| `slides.decks.update` | `id`, + any of `title, subtitle, density, theme` | deck |
-| `slides.decks.replace` | `id`, + `title?, subtitle?, density?, theme?, slides?` | deck (bulk overwrite) |
+| `slides.decks.get` | `id` | full deck (theme + runtime + slides) |
+| `slides.decks.create` | `title?, subtitle?, density?, templateId?, theme?, runtime?, slides?` | new deck |
+| `slides.decks.update` | `id`, + any of `title, subtitle, density, theme, runtime` | deck |
+| `slides.decks.replace` | `id`, + `title?, subtitle?, density?, theme?, runtime?, slides?` | deck (bulk overwrite) |
 | `slides.decks.delete` | `id` | `{ ok }` |
 
 `density` is `"low"` or `"high"`. `theme` is `{ fontLinks, css, stageBg }`.
-`slides` is an array of slide objects (see the authoring contract).
+`runtime` is `{ libs, js, connectOrigins, frameOrigins }`; omit it for a static
+deck or pass `null` to update/replace to remove it. `slides` is an array of slide
+objects (see the authoring contract).
 
 ### Slides
 
@@ -65,7 +71,7 @@ automatically — author with its classes/tokens.
 | Method | Params | Returns |
 | ------ | ------ | ------- |
 | `slides.templates.list` | — | `[{ id, name, tagline, audiences, description }]` |
-| `slides.templates.get` | `templateId` | `{ …meta, theme, guide, sampleSlides }` (full coding guide) |
+| `slides.templates.get` | `templateId` | `{ …meta, theme, runtime, guide, sampleSlides }` (full coding guide) |
 | `slides.decks.applyTemplate` | `id`, `templateId` | deck (swaps theme; re-skins vocabulary-based slides instantly; seeds sample slides if the deck is empty) |
 
 `slides.decks.create` accepts `templateId` to start from a style (seeds its theme
@@ -75,6 +81,46 @@ developer→dark-tech, creative→pastel-creative, general→clean-minimal) — 
 unsure. Because every template implements the same component vocabulary,
 switching templates re-skins existing slides without rewriting them; only custom
 (non-vocabulary) CSS needs follow-up.
+
+Applying a template also adopts that template's runtime. A static template
+therefore removes an old interactive runtime; an interactive template supplies
+its sample behavior. When applying an interactive template to existing custom
+slides, verify that its runtime selectors still match useful markup.
+
+### Artifacts mappings
+
+For a deck artifact, use the same `theme`, `runtime`, and slide shapes with these
+method names:
+
+| Purpose | Artifacts method |
+| --- | --- |
+| List/read | `artifacts.list`, `artifacts.get` |
+| Create | `artifacts.create { kind: "deck", templateId?, theme?, runtime?, slides? }` |
+| Partial/bulk edit | `artifacts.update`, `artifacts.replace` |
+| Slide edits | `artifacts.slides.add/update/text.replace/remove/reorder/move` |
+| Templates | `artifacts.templates.list/get`, `artifacts.applyTemplate` |
+| Versions | `artifacts.versions.list`, `artifacts.revert` |
+| Publish | `artifacts.publish`, `artifacts.unpublish` |
+
+Artifacts pages use:
+
+```json
+{
+  "method": "artifacts.page.set",
+  "params": {
+    "id": "<artifact>",
+    "html": "<main>…</main>",
+    "css": "/* responsive styles */",
+    "js": "/* page behavior */",
+    "fontLinks": [],
+    "libs": [],
+    "background": "#101018"
+  }
+}
+```
+
+Each provided page field replaces that field; omitted fields remain unchanged.
+Use `artifacts.page.text.replace` for small exact-string edits.
 
 ### AI images
 
@@ -137,6 +183,12 @@ everything to `create`):
     "title": "Q3 Pitch",
     "density": "low",
     "theme": { "fontLinks": ["https://…"], "stageBg": "#0a0a12", "css": ":root{…}.slide{…}.pad{…}" },
+    "runtime": {
+      "libs": [],
+      "js": "document.addEventListener('input', function (event) { /* delegated behavior */ });",
+      "connectOrigins": [],
+      "frameOrigins": []
+    },
     "slides": [
       { "name": "Title", "slideClass": "title-slide", "transition": "zoom", "bodyHtml": "<div class=\"pad\">…</div>" },
       { "name": "Problem", "transition": "slide", "bodyHtml": "<div class=\"pad\">…</div>" }
@@ -146,7 +198,8 @@ everything to `create`):
 ```
 
 To iterate, use granular `slides.slides.update` / `add` / `reorder` so you only
-touch what changes.
+touch what changes. Use `slides.decks.update { id, runtime: { js: "…" } }` for a
+partial runtime change; omitted runtime fields preserve their existing values.
 
 ## REST equivalents
 

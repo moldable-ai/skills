@@ -1,22 +1,32 @@
 ---
 name: slides
-description: Author beautiful, animation-rich presentation decks inside the Moldable Slides app and publish them as shareable Moldable Artifact links. Use when the user wants to build a slide deck, pitch deck, presentation, or talk in Moldable, or to edit/restyle/reorder/publish an existing deck. Drives the Slides app via its RPC API rather than writing standalone HTML files.
+description: Author, review, and template beautiful responsive presentations and interactive web artifacts in the Moldable Slides and Artifacts apps. Use when the user wants to create or edit a slide deck, pitch, talk, interactive report, calculator/chart/table experience, durable runtime state, deck/page template, or publishable artifact in Moldable. Covers optional deck runtimes, staged builds, responsive page/deck authoring, persistence, and the Slides/Artifacts RPC APIs instead of standalone files.
 ---
 
-# Slides (Moldable)
+# Slides & Artifacts (Moldable)
 
-Author and publish stunning, animation-rich presentations through the **Slides
-Moldable app**. You write per-slide HTML/CSS and a deck theme; the app renders it
-on a fixed 16:9 stage with animations, keyboard/touch navigation, live preview,
-present mode, and one-click publishing to a public Moldable Artifact link.
+Author and publish polished presentations through **Slides**, or responsive pages
+and decks through **Artifacts**. A deck combines per-slide HTML, a theme, and an
+optional runtime for purposeful interactions. A page owns its full HTML/CSS/JS.
+Both publish as responsive web artifacts.
 
-This skill is the Slides app's **operating manual**, not a template pack. The
-look — 47 studio-grade styles, the shared component vocabulary, and every design
+This skill is the Slides/Artifacts **authoring manual**, not a template pack. The
+look — the studio-grade styles, shared component vocabulary, and every design
 token — lives in the app and is injected into your prompt when a deck is open
 (see "Choose a look"). Your job is to drive the app well and author within its
 contract. The one rule to remember: **you do not produce standalone `.html`
-files.** You author decks by calling the Slides RPC; the app owns the document
-shell, the fixed-stage CSS, the navigation controller, and the publish pipeline.
+files.** Author through the RPC namespace of the app that owns the artifact;
+the app owns the document shell, responsive behavior, navigation controller,
+and publish pipeline.
+
+Use the existing two artifact kinds; do not invent an "interactive" third kind:
+
+- Use a **deck** when the narrative is stepped and presentation-led. Add a
+  runtime only for interactions that materially improve understanding.
+- Use a **page** in Artifacts when the experience should scroll freely or own
+  the whole responsive layout. Pages already support HTML/CSS/JS and libraries.
+- Keep static decks static. Multi-user state and collaboration are out of scope
+  unless the user explicitly requests backend architecture.
 
 ## What the app provides (do NOT re-create it)
 
@@ -28,25 +38,38 @@ The app injects all of this into every deck automatically:
   keys, mouse-wheel and touch-swipe, a progress bar + slide counter, fullscreen
   (`f`), speaker-notes overlay (`s`), and deep-link hashes (`#3`).
 - The base animation CSS: per-slide enter transitions (`fade`/`slide`/`zoom`)
-  and the `.reveal` staggered-entrance helper (`.reveal:nth-child(1..8)`).
+  and the `.reveal` staggered-entrance helper (`.reveal:nth-child(1..8)`). Use
+  `data-build="N"` for staged reveals and `data-deck-advance` for an explicit
+  reveal/advance button.
+- Interaction ownership for links, buttons, form controls, editable content,
+  and `[data-deck-interactive]`, so slide navigation does not steal their input.
+- Runtime lifecycle events: `deck:slidechange` and `deck:slidepatch`.
+- `window.moldableState(namespace)` for durable, JSON-serializable interaction
+  state in both deck runtimes and Artifacts pages. The local apps persist it in
+  the active workspace; the published artifact host persists it per browser.
 - The shared **component vocabulary** + the active style's tokens (injected as a
   coding guide while a deck is open).
 - `prefers-reduced-motion` support and print/PDF rules.
 
-**Your job is only to author, per slide:** the inner HTML of the stage section,
-plus the deck-wide `theme` (font links + CSS variables + layout classes). See
+**Your job is to author:** the inner HTML of each slide, the deck-wide `theme`,
+and—only when needed—the optional `runtime`. For Artifacts pages, author the
+page document (`html`, `css`, `js`, `fontLinks`, `libs`, `background`). See
 [references/authoring-contract.md](references/authoring-contract.md) — read it
-before writing any slide.
+before writing any slide, and read
+[references/interactive-runtime.md](references/interactive-runtime.md) before
+adding authored behavior.
 
 ## The data model
 
-A **deck** = `{ title, subtitle, density, theme, slides[] }`.
+A **deck** = `{ title, subtitle, density, theme, runtime?, slides[] }`.
 
 - `theme.fontLinks`: array of `https://` stylesheet URLs (Fontshare / Google
   Fonts — never system fonts).
 - `theme.css`: `:root` custom properties, plus your own layout classes and
   `@keyframes`. Do **not** paste the fixed-stage base CSS or controller here.
 - `theme.stageBg`: the letterbox color around the 16:9 stage.
+- `runtime`: optional `{ libs, js, connectOrigins, frameOrigins }`. Omit it for
+  static decks; pass `null` through update/replace to remove it.
 - each **slide** = `{ name, bodyHtml, slideClass?, transition?, notes? }`:
   - `bodyHtml`: inner HTML of `<section class="slide">`, authored at 1920×1080.
   - `slideClass`: extra classes (e.g. `title-slide`).
@@ -64,6 +87,10 @@ are in [references/rpc-api.md](references/rpc-api.md). The essentials:
 - `slides.slides.add` / `update` / `remove` / `reorder` / `move` — granular edits.
 - `slides.deck.publish` / `unpublish` — publish to / forget a shareable link.
 
+In Artifacts, use `artifacts.create/update/replace`, `artifacts.slides.*`,
+`artifacts.page.set`, `artifacts.templates.*`, and `artifacts.publish`. The deck
+authoring contract is the same; only the RPC namespace differs.
+
 You can call these via the app's HTTP endpoint (`POST /api/moldable/rpc`) or, as
 a fallback, edit the deck JSON files directly under the app's workspace data dir
 (`apps/slides/data/decks/<id>.json`) — the app re-reads from disk and the open
@@ -74,10 +101,14 @@ window updates live. Prefer RPC.
 These apply to every slide (the app enforces the mechanics; you must respect the
 design constraints):
 
-- Author at 1920×1080. Use fixed pixel measurements at that size.
-- Never reflow content for phones — the whole stage scales as one unit.
+- Author the presentation canvas at 1920×1080.
+- Published decks automatically become tall, scrolling sections on narrow
+  phones. Compose from the injected vocabulary so columns collapse, and add a
+  matching `@media (max-width: 640px) { html.deck-can-flow … }` override for
+  bespoke fixed-pixel decoration.
 - No scrolling, no overflow, no overlapping panels, no text below comfortable
-  reading size. If content overflows, **split it into more slides**.
+  reading size on the desktop stage. If content overflows, **split it into more
+  slides**.
 - Never use `display:none/block` to switch slides (the controller owns that).
 - Negating CSS functions silently fails: use `calc(-1 * clamp(...))`, never
   `-clamp(...)`.
@@ -103,8 +134,9 @@ when available):
 ### Phase 2 — Choose a look
 
 **Use the app's built-in style library — don't hand-roll a theme.** The app
-ships 47 studio-grade styles; each is a complete sample deck with its own design
-language, and all of them implement the same component vocabulary. Call
+ships an evolving catalog of studio-grade styles; each is a complete sample
+deck with its own design language, and all implement the same component
+vocabulary. Call
 `slides.templates.list` (or let the user pick in the app's gallery) and match the
 style to the use case by its `audiences` / `categories` — founder→`bold-founder`,
 finance→`finance-pro`, PM→`product-brief`, teacher→`classroom`,
@@ -133,8 +165,17 @@ on "show, don't tell."
 Author each slide's `bodyHtml` from the injected component vocabulary, applying
 the density choice throughout. Add `class="reveal"` to elements you want to
 animate in, set per-slide `transition`, and write `notes` for speaker-led decks.
+For calculators, filters, sortable tables, live charts, local games, or embeds,
+add a minimal deck runtime and mark its interaction surface with
+`data-deck-interactive`. Use delegated listeners and idempotent initialization;
+do not add JavaScript merely to make a static slide feel busier. When users can
+change meaningful state, use `window.moldableState()`—never direct
+`localStorage`—and hydrate before the first render. The bundled `open-house`,
+`working-session`, and `security-training` templates are durable-state
+references in both apps; `data-dashboard` demonstrates transient interaction.
 Create the deck via `slides.decks.create` (or build then add slides). Verify in
-the app's preview: nothing overflows, panels don't overlap, the title slide lands.
+the app's preview: controls work, navigation does not steal input, nothing
+overflows, bespoke layouts reflow on a ~390px viewport, and the title slide lands.
 
 **Design the deck as a product, not a slideshow** — especially for persuasive
 decks (pitch / sales / partnership):
@@ -157,8 +198,9 @@ decks (pitch / sales / partnership):
 
 ### Phase 4 — Present & Publish
 
-The user presents from the app (Present button / fullscreen). To share, call
-`slides.deck.publish` (or they click Publish) — the app bundles the deck into a
+The user presents from the app (Present button / fullscreen). To share a Slides
+deck, call `slides.deck.publish`; for Artifacts call `artifacts.publish` (or use
+the app's Publish control). The app bundles the creation into a
 static `index.html` + assets and returns a public, unlisted Moldable Artifact
 URL that works on any device. See the host artifact rules in the moldable-apps
 skill (`references/artifact-publishing.md`). Only publish when the user asks.
@@ -179,17 +221,21 @@ and need no files. Beyond that:
 - **User-supplied images** — store them as deck assets and reference them the
   same way. Keep images as separate files, never giant `data:` URLs.
 
+In Artifacts, use the equivalent `artifacts.images.generate/edit/list` methods.
+
 ## Undo / versions
 
 Every content edit auto-saves a restore point. If the user dislikes a change,
 use `slides.versions.list { id }` then `slides.deck.revert { id, versionId }`
 (reverts are themselves undoable). The editor also has a "History" panel.
+For Artifacts, use `artifacts.versions.list` and `artifacts.revert`.
 
 ## Reference index
 
 | File | Purpose |
 | ---- | ------- |
-| [references/authoring-contract.md](references/authoring-contract.md) | The exact per-slide HTML + theme model; what the app injects; what NOT to write. **Read first.** |
+| [references/authoring-contract.md](references/authoring-contract.md) | The exact page/deck HTML, theme, and runtime model; what the apps inject; what NOT to write. **Read first.** |
+| [references/interactive-runtime.md](references/interactive-runtime.md) | Deck runtime, interaction ownership, lifecycle events, staged builds, accessibility, and template patterns. |
 | [references/style-library.md](references/style-library.md) | How the style library works, how its coding guide reaches you, and how to pick a style. |
-| [references/rpc-api.md](references/rpc-api.md) | Slides RPC methods, params, and call examples. |
+| [references/rpc-api.md](references/rpc-api.md) | Slides and Artifacts RPC methods, params, and call examples. |
 | [references/animation-patterns.md](references/animation-patterns.md) | Effect-to-feeling guide + CSS-only motion/background snippets. |

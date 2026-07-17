@@ -1,8 +1,7 @@
-# Slide Authoring Contract
+# Slides & Artifacts Authoring Contract
 
-This is the exact contract for what you author versus what the Slides app
-injects. Get this right and your slides render identically in the live preview
-and the published artifact.
+This is the contract for what you author versus what Slides or Artifacts injects.
+Decks share the same renderer in both apps. Artifacts also supports full pages.
 
 ## What the app injects (never write these yourself)
 
@@ -17,11 +16,13 @@ For every deck, the app composes a full HTML document containing, in order:
    with your `bodyHtml` inside.
 4. The deck chrome (progress bar + counter), a hidden speaker-notes panel, and
    the controller `<script>`.
+5. If `runtime` is present, its pinned HTTPS libraries and authored JavaScript,
+   nonce-authorized by the generated Content Security Policy.
 
 So: **never** include `<html>`, `<head>`, `<body>`, the `.deck-viewport` /
 `.deck-stage` wrappers, the `.slide` section tag, the fixed-stage base CSS, the
-navigation controller, or stage-scaling JS. Authoring those will conflict with
-what the app injects.
+navigation controller, or stage-scaling JS. Do not put behavior in
+`bodyHtml` `<script>` tags; use `runtime.js`.
 
 The exact injected CSS is the app's, not this skill's — read it from the source
 of truth if you need it: `src/shared/render.ts` (`VIEWPORT_BASE_CSS`,
@@ -60,6 +61,31 @@ Do **not** put the fixed-stage base CSS, the `.reveal` rules, or the chrome here
 — those already exist. You may add extra `.reveal:nth-child` delays if a slide
 needs more than 8 staggered children.
 
+### `runtime?: DeckRuntime`
+
+Omit this field for static decks. For interactive decks:
+
+```json
+{
+  "libs": [],
+  "js": "/* delegated deck-wide behavior */",
+  "connectOrigins": [],
+  "frameOrigins": []
+}
+```
+
+- `libs`: pinned `https://` script URLs loaded before `js`.
+- `js`: deck-wide behavior. Delegate events from `document` so live slide
+  patches do not destroy listeners.
+- `connectOrigins`: HTTPS origins allowed for `fetch`/WebSocket. Empty permits
+  same-origin only for runtime decks.
+- `frameOrigins`: HTTPS origins allowed in iframes. Empty disables frames for
+  runtime decks.
+- `null` through deck update/replace removes an existing runtime.
+
+Read [interactive-runtime.md](interactive-runtime.md) for the lifecycle,
+interaction, accessibility, and staged-build conventions.
+
 ### Per slide
 
 | Field | Meaning |
@@ -70,6 +96,12 @@ needs more than 8 staggered children.
 | `transition` | Enter animation: `fade` (default), `slide`, `zoom`, or `none`. |
 | `notes` | Speaker notes. Shown in present mode via `s`; never on the slide. |
 
+Inside `bodyHtml`, mark custom interactive regions with
+`data-deck-interactive`. Native links, buttons, inputs, textareas, selects, and
+editable content are protected automatically. Use `data-build="1"`,
+`data-build="2"`, … for staged reveals and `data-deck-advance` on an explicit
+reveal/advance button.
+
 ## Animation conventions
 
 - Add `class="reveal"` to elements that should rise + fade in when the slide
@@ -79,7 +111,8 @@ needs more than 8 staggered children.
 - Pick `transition` per slide for the whole-slide enter feel (`zoom` reads as
   confident for titles; `slide` for sequential content; `fade` is the safe
   default).
-- Keep motion CSS-only. `prefers-reduced-motion` is already handled.
+- Keep purely visual motion CSS-only. Put meaningful calculations, filters, and
+  other behavior in `runtime.js`. `prefers-reduced-motion` is already handled.
 
 ## Worked example (one slide)
 
@@ -108,6 +141,46 @@ slide:
 The seeded "Welcome to Slides" deck (in the app on first run) is a complete,
 production-quality example of this contract — read it from
 `apps/slides/data/decks/<id>.json` if you want a full reference deck.
+
+For a working interactive example, inspect the `data-dashboard` template in
+either app. It includes a filterable chart, sortable table, live scenario
+calculator, interaction ownership, and staged results.
+
+## Mobile and print
+
+The 1920×1080 canvas is the desktop authoring coordinate system. Published
+decks reflow into tall, scrolling sections at narrow phone widths. Components
+from the injected vocabulary already stack and rescale. When bespoke template
+CSS uses hardcoded dimensions, add phone overrides scoped like:
+
+```css
+@media (max-width: 640px) {
+  html.deck-can-flow .custom-grid { grid-template-columns: 1fr !important; }
+}
+```
+
+Staged content is shown in mobile reflow, thumbnails, and print. Presentation-
+only `data-deck-advance` controls are hidden in mobile reflow and print.
+
+## Artifacts pages
+
+Use a page instead of a deck when the experience should scroll freely or own
+the entire responsive layout. A page document is:
+
+```json
+{
+  "html": "<main>…</main>",
+  "css": "/* responsive page styles */",
+  "js": "/* page behavior */",
+  "fontLinks": [],
+  "libs": [],
+  "background": "#101018"
+}
+```
+
+Pages receive a reset, scroll-reveal support via `.reveal`, scroll variables
+`--scroll`/`--scroll-y`, and reduced-motion handling. Unlike decks, page JS
+lives in `page.js` and does not use deck navigation or build attributes.
 
 ## Density quick rules
 
