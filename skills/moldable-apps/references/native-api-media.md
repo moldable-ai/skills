@@ -78,6 +78,9 @@ const microphones = devices.filter((device) => device.kind === "audioinput");
 
 Device labels can be blank until the user grants a media permission. Persist a
 device ID only as a preference, then recover if it disappears.
+When enumeration belongs to a microphone-only flow, pass `"microphone"` to
+`enumerateMoldableMediaDevices()` so a structured failure identifies the
+initiating capability. Camera remains the default for existing callers.
 
 ## Camera
 

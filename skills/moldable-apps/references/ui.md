@@ -58,6 +58,53 @@ import {
 } from '@moldable-ai/ui'
 ```
 
+## Hardware Components
+
+`@moldable-ai/ui` also ships polished, drop-in components for every native
+hardware capability — permission flows, device pickers, live states, and error
+handling built in. **Prefer these over hand-rolling UI on the imperative
+`getMoldable*` helpers.**
+
+```tsx
+import {
+  // Full surfaces (one per capability)
+  CameraPreview,        // live camera: device switching, snapshots, permission states
+  MicrophoneMeter,      // live input level visualizer
+  ScreenSharePreview,   // display capture surface
+  SystemAudioMonitor,   // macOS system-audio capture + level meter
+  LocationPanel,        // one-shot position with mono coordinate readout
+  PowerPanel, BatteryGauge,
+  DisplayMap,           // to-scale monitor arrangement map
+  NotificationsPanel,
+  SecureStoragePanel,
+  SerialConsole,        // terminal-style RX/TX console
+  UsbDevicePanel, HidDevicePanel,
+  MidiMonitor, BluetoothPanel,
+  CapabilityMatrix,     // support grid for all 22 capabilities
+  // Controls
+  LocalAuthButton,      // Touch ID / Windows Hello
+  HapticButton, ClipboardCopyButton, ShortcutRecorder,
+  // Building blocks for custom hardware UI
+  CapabilityBadge, HardwarePanel, DeviceList, StreamLog, Readout, LiveIndicator,
+  // Hooks (same state machines, bring your own UI)
+  useMoldableCapability, useMoldableCamera, useMoldableMicrophone,
+  useMoldableScreenShare, useMoldableSystemAudio, useMoldableLocation,
+  useMoldableDisplays, useMoldableNotifications, useMoldablePower,
+  useMoldableLocalAuth, useMoldableHaptics, useMoldableSecureStorage,
+  useMoldableUsb, useMoldableHid, useMoldableSerial, useMoldableMidi,
+  useMoldableBluetooth, useMoldableClipboard, useMoldableGlobalShortcut,
+} from '@moldable-ai/ui'
+```
+
+Every component degrades gracefully outside Moldable and handles
+checking/unsupported/denied/idle/active/error states itself. The hooks listed
+above expose the same state machines when you need custom visuals.
+
+Discover props and patterns by reading the source — one file per capability in
+`node_modules/@moldable-ai/ui/dist/components/hardware/` (or
+`packages/ui/src/components/hardware/` in the desktop repo; start with its
+`README.md`). The `native-lab-*` apps in `shared/apps/` are working examples.
+
 ## Semantic Colors
 
 Always use semantic colors:

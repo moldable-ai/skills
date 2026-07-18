@@ -29,12 +29,16 @@ try {
 }
 ```
 
-The helpers use WebHID when present and a scoped native fallback otherwise.
-Feature-report read/write helpers are also exported. `getMoldableHidDevices()`
-lists browser-granted WebHID devices only and returns an empty list on the native
-fallback. `forgetMoldableHidDevice()` revokes WebHID permission only when the
-runtime supports it; on the native fallback it closes the scoped handle and does
-not revoke the app's Moldable access grant.
+The helpers use WebHID when present and a scoped native fallback otherwise. Use
+`receiveMoldableHidFeatureReport()` and `sendMoldableHidFeatureReport()` for
+feature reports. `getMoldableHidDevices()`
+lists browser-granted WebHID devices only and rejects with `unsupported` when
+WebHID is absent. It does not run native discovery or turn the absence of a
+passive grant registry into an empty list. Use `requestMoldableHidDevices()`
+from a user action for native fallback discovery. `forgetMoldableHidDevice()`
+revokes WebHID permission only when the runtime supports it; on the native
+fallback it closes the scoped handle and does not revoke the app's Moldable
+access grant.
 
 ## Connection lifecycle
 

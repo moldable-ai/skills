@@ -20,10 +20,14 @@ if (transport.kind === 'web-midi') {
 }
 ```
 
-The web path also exports `requestMoldableMIDIAccess()`, input/output
-enumeration, state observation, and owned input/output connection helpers. The
-desktop fallback exposes `requestPort()`, `send()`, input `observeMessages()`,
-and `close()` through scoped opaque handles.
+The web path also exports `requestMoldableMIDIAccess()`,
+`getMoldableMIDIInputs()`, `getMoldableMIDIOutputs()`,
+`observeMoldableMIDIState()`, `openMoldableMIDIInput()`, and
+`openMoldableMIDIOutput()`. The desktop fallback exposes `requestPort()`,
+`send()`, input `observeMessages()`, and `close()` through scoped opaque
+handles. The fallback-aware access helper verifies the desktop bridge before
+returning; it does not enumerate devices or open a port until `requestPort()` is
+called.
 
 ## Rules
 

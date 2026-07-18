@@ -74,7 +74,7 @@ Read these for in-depth guidance:
 - [references/browser-storage-audit.md](references/browser-storage-audit.md) — Current browser storage usage and migration guidance
 - [references/desktop-apis.md](references/desktop-apis.md) — Router for desktop integration APIs
 - [references/desktop-message-apis.md](references/desktop-message-apis.md) — Window, chat, file, and artifact postMessage APIs
-- [references/native-apis.md](references/native-apis.md) — Typed native capability API overview and usage rules
+- [references/native-apis.md](references/native-apis.md) — Typed native capability API overview and usage rules; **hardware UI components** (CameraPreview, SerialConsole, LocationPanel, …) are listed in [references/ui.md](references/ui.md)
 - [references/native-api-support.md](references/native-api-support.md) — Native capability support matrix and permission summary
 - [references/native-api-permissions.md](references/native-api-permissions.md) — `nativeHardware` declarations and per-app workspace grants
 - [references/native-api-media.md](references/native-api-media.md) — Camera, microphone, display capture, macOS permission status/request/diagnostics, and system audio
@@ -140,6 +140,14 @@ import {
 ```
 
 See [references/ui.md](references/ui.md) for complete component list and usage.
+
+For native hardware UI (camera, mic, location, serial, BLE, …), use the
+prebuilt hardware components from `@moldable-ai/ui` — `CameraPreview`,
+`MicrophoneMeter`, `LocationPanel`, `SerialConsole`, `CapabilityMatrix`, etc. —
+instead of building your own on the imperative helpers. They ship the
+permission flows, device pickers, and live/error states already styled. Full
+list in [references/ui.md](references/ui.md) § Hardware Components; read the
+component source to discover props.
 
 ### 2. Workspace-Aware Storage
 

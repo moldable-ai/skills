@@ -23,9 +23,15 @@ if (transport.kind === 'desktop-bridge') {
 ```
 
 When Web Bluetooth is available, the transport contains the standard-shaped
-selected device for use with the exported connection and GATT helpers. The
-desktop fallback supports allowed-service discovery, characteristic read/write,
-notification observation, and disconnect.
+selected device. Use `getMoldableBluetoothAvailability()` for adapter status,
+`requestMoldableBluetoothDevice()` for the direct Web Bluetooth chooser,
+`connectMoldableBluetoothDevice()` to connect, and
+`getMoldableBluetoothCharacteristic()`, `readMoldableBluetoothValue()`,
+`writeMoldableBluetoothValue()`, and
+`observeMoldableBluetoothNotifications()` for GATT operations. The desktop
+fallback returned by `requestMoldableBluetoothWithFallback()` provides the
+equivalent allowed-service discovery, read/write, notification observation, and
+disconnect operations through its scoped device.
 
 ## Connection lifecycle
 

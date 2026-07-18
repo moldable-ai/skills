@@ -3,6 +3,11 @@
 Moldable apps access protected desktop capabilities through typed helpers from
 `@moldable-ai/ui`. Never call host message protocols or Tauri commands directly.
 
+**Building UI on these APIs?** Reach for the prebuilt hardware components first
+(`CameraPreview`, `SerialConsole`, `LocationPanel`, `CapabilityMatrix`, …) —
+see [ui.md](ui.md) § Hardware Components. The imperative helpers below are the
+right layer for headless logic and custom visuals.
+
 ## Choose a reference
 
 - [Support and permissions](native-api-support.md)
@@ -65,6 +70,27 @@ unsupported”; it intentionally returns `true` for `partial`.
 
 The runtime result is authoritative. Do not infer support from a user agent,
 `navigator.platform`, a manifest declaration, or the presence of an OS API.
+
+## Bridge errors
+
+Desktop-bridge failures reject with `NativeHardwareBridgeError`. Its public
+fields are `code: NativeHardwareErrorCode`, `message`, optional `details`, and
+optional `retryable`. Use `toNativeHardwareBridgeError()` at a bridge-backed API
+boundary when the caught value is unknown.
+
+Error codes are grouped by response:
+
+- Caller or bridge contract: `invalid_request`, `not_in_moldable`,
+  `invalid_response`.
+- Request lifecycle: `timeout`, `aborted`, `cancelled`.
+- Capability or authorization: `unsupported`, `unavailable`,
+  `permission_denied`.
+- Unexpected host execution failure: `host_error`. The host returns this
+  promptly with a generic message and does not expose raw platform errors.
+
+Treat cancellation and denial as normal UI states. Retry only while the user
+still intends the operation and `retryable === true`; never display or persist
+`details` without validating that it is safe.
 
 ## Security boundaries
 

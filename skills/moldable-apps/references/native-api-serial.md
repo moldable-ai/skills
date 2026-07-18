@@ -27,13 +27,17 @@ try {
 ```
 
 The helpers prefer Web Serial and otherwise use an opaque native port. When
-multiple native ports match, `selectNativePort` is required. Signal read/write,
-port listing, and permission-forget helpers are also exported.
+multiple native ports match, `selectNativePort` is required. Use
+`getMoldableSerialSignals()` and `setMoldableSerialSignals()` for signals,
+`getMoldableSerialPorts()` for browser-granted ports, and
+`forgetMoldableSerialPort()` for permission-forget behavior.
 `getMoldableSerialPorts()` lists browser-granted Web Serial ports only and
-returns an empty list on the native fallback. `forgetMoldableSerialPort()`
-revokes browser permission only when the runtime supports it; on the native
-fallback it closes the scoped handle and does not revoke the app's Moldable
-access grant.
+rejects with `unsupported` when Web Serial is absent. It does not run native
+discovery or turn the absence of a passive grant registry into an empty list.
+Use `requestMoldableSerialPort()` from a user action for native fallback
+discovery. `forgetMoldableSerialPort()` revokes browser permission only when the
+runtime supports it; on the native fallback it closes the scoped handle and does
+not revoke the app's Moldable access grant.
 
 ## Connection lifecycle
 
@@ -51,6 +55,7 @@ port.addEventListener(
   },
   { once: true },
 )
+```
 
 Request a fresh native fallback port before reconnecting. Its opaque selector is
 single-use and is not a durable hardware identity.
@@ -68,4 +73,3 @@ single-use and is not a durable hardware identity.
 
 Serial is partial on every platform because device drivers, ownership, webview
 support, and hardware vary.
-```

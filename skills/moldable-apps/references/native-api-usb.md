@@ -34,11 +34,17 @@ bounded descriptors and returns an opaque, app-scoped device. If more than one
 native device matches, `selectNativeDevice` is required; render the candidates
 and return exactly one supplied object.
 
-Also available: control transfers, halt clear, and reset helpers.
-`getMoldableUsbDevices()` lists browser-granted WebUSB devices only and returns an
-empty list on the native fallback. `forgetMoldableUsbDevice()` revokes WebUSB
-permission only when the runtime supports it; on the native fallback it closes
-the scoped handle and does not revoke the app's Moldable access grant.
+Use `readMoldableUsbControlTransfer()` and
+`writeMoldableUsbControlTransfer()` for control transfers,
+`clearMoldableUsbHalt()` for stalled endpoints, and
+`resetMoldableUsbDevice()` for an explicit reset.
+`getMoldableUsbDevices()` lists browser-granted WebUSB devices only and rejects
+with `unsupported` when WebUSB is absent. It does not run native discovery or
+turn the absence of a passive grant registry into an empty list. Use
+`requestMoldableUsbDevice()` from a user action for native fallback discovery.
+`forgetMoldableUsbDevice()` revokes WebUSB permission only when the runtime
+supports it; on the native fallback it closes the scoped handle and does not
+revoke the app's Moldable access grant.
 
 ## Connection lifecycle
 

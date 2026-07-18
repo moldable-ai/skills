@@ -3,8 +3,9 @@
 Use the power/session helpers for adaptive work, inactivity UI, explicit
 lock/suspend reactions, and short-lived sleep prevention.
 
-Runtime capability IDs are `power-monitor` for state, idle, thermal, and event
-helpers, and `sleep-blocker` for blocker helpers.
+Runtime capability IDs map by operation: `power-monitor` covers power and
+thermal state, `idle-state` covers idle queries, `session-events` covers event
+subscriptions, and `sleep-blocker` covers blocker creation.
 
 ```typescript
 import {
