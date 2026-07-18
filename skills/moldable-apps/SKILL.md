@@ -1,6 +1,6 @@
 ---
 name: moldable
-description: Complete guide for building Moldable apps. Use this skill when creating new apps with scaffoldApp, modifying existing apps, implementing workspace-aware storage, integrating with the Moldable desktop via postMessage APIs (moldable:show-in-folder, moldable:set-chat-input, moldable:set-chat-instructions, moldable:save-file), publishing public unlisted web artifacts through Moldable Artifacts, configuring workspaces, managing skills/MCPs, or troubleshooting app issues. Essential for any Moldable app development task.
+description: Complete guide for building Moldable apps. Use this skill when creating or modifying apps, implementing workspace-aware storage, using typed native APIs for media, location, clipboard, notifications, displays, shortcuts, power/session state, local authentication, haptics, secure storage, USB, HID, serial, MIDI, or Bluetooth, declaring nativeHardware permissions, integrating with Moldable desktop messages, publishing artifacts, configuring workspaces, managing skills/MCPs, or troubleshooting app issues.
 ---
 
 # Moldable App Development
@@ -33,15 +33,15 @@ This skill provides comprehensive knowledge for building and modifying apps with
 
 ```typescript
 scaffoldApp({
-  appId: "expense-tracker", // lowercase, hyphens only
-  name: "Expense Tracker", // Display name
-  icon: "💰", // Emoji icon
-  description: "Track expenses and generate reports",
+  appId: 'expense-tracker', // lowercase, hyphens only
+  name: 'Expense Tracker', // Display name
+  icon: '💰', // Emoji icon
+  description: 'Track expenses and generate reports',
   extraDependencies: {
     // Optional npm packages
-    zod: "^3.0.0",
+    zod: '^3.0.0',
   },
-});
+})
 ```
 
 **After scaffolding**, customize:
@@ -72,7 +72,29 @@ Read these for in-depth guidance:
 - [references/ui.md](references/ui.md) — **@moldable-ai/ui components**, shadcn/ui, themes, rich text editor, Cmd+K app commands
 - [references/storage-patterns.md](references/storage-patterns.md) — Filesystem storage, React Query, workspace-aware APIs
 - [references/browser-storage-audit.md](references/browser-storage-audit.md) — Current browser storage usage and migration guidance
-- [references/desktop-apis.md](references/desktop-apis.md) — postMessage APIs (open-url, show-in-folder, set-chat-input, save-file, artifact publish)
+- [references/desktop-apis.md](references/desktop-apis.md) — Router for desktop integration APIs
+- [references/desktop-message-apis.md](references/desktop-message-apis.md) — Window, chat, file, and artifact postMessage APIs
+- [references/native-apis.md](references/native-apis.md) — Typed native capability API overview and usage rules
+- [references/native-api-support.md](references/native-api-support.md) — Native capability support matrix and permission summary
+- [references/native-api-permissions.md](references/native-api-permissions.md) — `nativeHardware` declarations and per-app workspace grants
+- [references/native-api-media.md](references/native-api-media.md) — Camera, microphone, display capture, macOS permission status/request/diagnostics, and system audio
+- [references/native-api-location.md](references/native-api-location.md) — Current-position API and permission behavior
+- [references/native-api-clipboard.md](references/native-api-clipboard.md) — Native clipboard text APIs
+- [references/native-api-notifications.md](references/native-api-notifications.md) — Native system notifications and permissions
+- [references/native-api-displays.md](references/native-api-displays.md) — Connected display metadata
+- [references/native-api-global-shortcuts.md](references/native-api-global-shortcuts.md) — Global shortcut registration, events, conflicts, and cleanup
+- [references/native-api-power-session.md](references/native-api-power-session.md) — Power, current thermal and idle state, lifecycle events, plus queryable sleep blockers
+- [references/native-api-local-authentication.md](references/native-api-local-authentication.md) — Biometric-only or device-owner verification policies
+- [references/native-api-haptics.md](references/native-api-haptics.md) — API acceptance and honest physical-feedback semantics
+- [references/native-api-secure-storage.md](references/native-api-secure-storage.md) — Scoped credential values and non-secret backend diagnostics
+- [references/native-api-usb.md](references/native-api-usb.md) — Filtered WebUSB/native device access and transfers
+- [references/native-api-hid.md](references/native-api-hid.md) — Filtered WebHID/native reports and listeners
+- [references/native-api-serial.md](references/native-api-serial.md) — Web Serial/native ports, streams, and signals
+- [references/native-api-midi.md](references/native-api-midi.md) — Web MIDI/native ports, messages, and SysEx rules
+- [references/native-api-bluetooth.md](references/native-api-bluetooth.md) — Web Bluetooth/native BLE GATT access
+- [references/native-api-platform-macos.md](references/native-api-platform-macos.md) — macOS permission and support notes
+- [references/native-api-platform-windows.md](references/native-api-platform-windows.md) — Windows permission and support notes
+- [references/native-api-platform-linux.md](references/native-api-platform-linux.md) — Linux runtime and validation notes
 - [references/artifact-publishing.md](references/artifact-publishing.md) — Publishing public unlisted HTML/CSS/asset bundles through Moldable Artifacts
 - [references/app-to-app-communication.md](references/app-to-app-communication.md) — App-to-app RPC, capability manifests, workspace-scoped grants, Calendar-owned OAuth/data access
 - [references/skills-mcps.md](references/skills-mcps.md) — Skills library, MCP configuration, custom MCP servers
@@ -87,24 +109,23 @@ For any visible app UI, read [references/design.md](references/design.md) before
 
 ```tsx
 // Import components from @moldable-ai/ui (NOT from shadcn directly)
+// For rich text editing
+import { MarkdownEditor } from '@moldable-ai/editor'
 import {
   Button,
   Card,
-  Input,
+  CodeBlock,
   Dialog,
+  Input,
+  Markdown,
   Select,
   Tabs,
   ThemeProvider,
   WorkspaceProvider,
-  useTheme,
-  Markdown,
-  CodeBlock,
   downloadFile,
   sendToMoldable,
-} from "@moldable-ai/ui";
-
-// For rich text editing
-import { MarkdownEditor } from "@moldable-ai/editor";
+  useTheme,
+} from '@moldable-ai/ui'
 ```
 
 **Use semantic colors only:**
@@ -125,19 +146,19 @@ See [references/ui.md](references/ui.md) for complete component list and usage.
 All apps **must** isolate data per workspace:
 
 ```tsx
-// Client - use workspaceId in query keys
-const { workspaceId, fetchWithWorkspace } = useWorkspace();
-const { data } = useQuery({
-  queryKey: ["items", workspaceId], // ← Include workspace!
-  queryFn: () => fetchWithWorkspace("/api/items").then((r) => r.json()),
-});
-
 // Server - extract workspace from request
-import { getWorkspaceFromRequest, getAppDataDir } from "@moldable-ai/storage";
+import { getAppDataDir, getWorkspaceFromRequest } from '@moldable-ai/storage'
+
+// Client - use workspaceId in query keys
+const { workspaceId, fetchWithWorkspace } = useWorkspace()
+const { data } = useQuery({
+  queryKey: ['items', workspaceId], // ← Include workspace!
+  queryFn: () => fetchWithWorkspace('/api/items').then((r) => r.json()),
+})
 
 export async function GET(request: Request) {
-  const workspaceId = getWorkspaceFromRequest(request);
-  const dataDir = getAppDataDir(workspaceId);
+  const workspaceId = getWorkspaceFromRequest(request)
+  const dataDir = getAppDataDir(workspaceId)
   // Read/write files in dataDir
 }
 ```
@@ -149,30 +170,30 @@ Apps communicate with Moldable desktop via postMessage:
 ```typescript
 // Open external URL
 window.parent.postMessage(
-  { type: "moldable:open-url", url: "https://..." },
-  "*",
-);
+  { type: 'moldable:open-url', url: 'https://...' },
+  '*',
+)
 
 // Show file in Finder
 window.parent.postMessage(
-  { type: "moldable:show-in-folder", path: "/path/to/file" },
-  "*",
-);
+  { type: 'moldable:show-in-folder', path: '/path/to/file' },
+  '*',
+)
 
 // Pre-populate chat input
 window.parent.postMessage(
-  { type: "moldable:set-chat-input", text: "Help me..." },
-  "*",
-);
+  { type: 'moldable:set-chat-input', text: 'Help me...' },
+  '*',
+)
 
 // Provide context to AI
 window.parent.postMessage(
   {
-    type: "moldable:set-chat-instructions",
-    text: "User is viewing meeting #123...",
+    type: 'moldable:set-chat-instructions',
+    text: 'User is viewing meeting #123...',
   },
-  "*",
-);
+  '*',
+)
 ```
 
 For public, shareable static outputs such as slides, meeting notes, reports,
@@ -186,13 +207,13 @@ Required providers for Moldable apps:
 
 ```tsx
 // src/client/main.tsx
-import { StrictMode } from "react";
-import { createRoot } from "react-dom/client";
-import { ThemeProvider, WorkspaceProvider } from "@moldable-ai/ui";
-import { App } from "./app";
-import { QueryProvider } from "./query-provider";
+import { StrictMode } from 'react'
+import { createRoot } from 'react-dom/client'
+import { ThemeProvider, WorkspaceProvider } from '@moldable-ai/ui'
+import { App } from './app'
+import { QueryProvider } from './query-provider'
 
-createRoot(document.getElementById("root")!).render(
+createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <ThemeProvider>
       <WorkspaceProvider>
@@ -202,7 +223,7 @@ createRoot(document.getElementById("root")!).render(
       </WorkspaceProvider>
     </ThemeProvider>
   </StrictMode>,
-);
+)
 ```
 
 ### 5. Adding Dependencies
@@ -211,9 +232,9 @@ Use `sandbox: false` for package manager commands:
 
 ```typescript
 await runCommand({
-  command: "cd ~/.moldable/shared/apps/my-app && pnpm add zod",
+  command: 'cd ~/.moldable/shared/apps/my-app && pnpm add zod',
   sandbox: false, // Required for network access
-});
+})
 ```
 
 ## App Management Tools

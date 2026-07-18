@@ -20,23 +20,29 @@ Every app has a `moldable.json` in its root directory:
   "moldableDependencies": {
     "@moldable-ai/ui": "^0.1.0"
   },
-  "env": []
+  "env": [],
+  "nativeHardware": []
 }
 ```
 
 ### Fields
 
-| Field | Required | Description |
-|-------|----------|-------------|
-| `name` | Yes | Display name shown in the UI |
-| `version` | Yes | Semantic version |
-| `description` | Yes | Brief description |
-| `icon` | Yes | Emoji icon for the app |
-| `visibility` | No | `private` (default) or `public` |
-| `category` | No | App category: `productivity`, `developer`, `media`, `custom` |
-| `tags` | No | Array of searchable tags |
-| `moldableDependencies` | No | Required Moldable packages |
-| `env` | No | Required environment variables |
+| Field                  | Required | Description                                                                                                                                |
+| ---------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| `name`                 | Yes      | Display name shown in the UI                                                                                                               |
+| `version`              | Yes      | Semantic version                                                                                                                           |
+| `description`          | Yes      | Brief description                                                                                                                          |
+| `icon`                 | Yes      | Emoji icon for the app                                                                                                                     |
+| `visibility`           | No       | `private` (default) or `public`                                                                                                            |
+| `category`             | No       | App category: `productivity`, `developer`, `media`, `custom`                                                                               |
+| `tags`                 | No       | Array of searchable tags                                                                                                                   |
+| `moldableDependencies` | No       | Required Moldable packages                                                                                                                 |
+| `env`                  | No       | Required environment variables                                                                                                             |
+| `nativeHardware`       | No       | Browser capabilities to delegate: camera, microphone, screen capture, location, clipboard read/write, USB, HID, serial, MIDI, or Bluetooth |
+
+`nativeHardware` is deny-by-default for sensitive embedded web capabilities.
+It does not bypass a Moldable grant, browser/OS permission, or device chooser.
+See [Native hardware permissions](native-api-permissions.md).
 
 ### Surfacing to the home screen
 
@@ -109,16 +115,16 @@ Each workspace has a `config.json` that lists registered apps:
 
 ### App Entry Fields
 
-| Field | Required | Description |
-|-------|----------|-------------|
-| `id` | Yes | Unique app identifier (lowercase, hyphens) |
-| `name` | Yes | Display name |
-| `icon` | Yes | Emoji icon |
-| `port` | Yes | Preferred port (auto-incremented if busy) |
-| `path` | Yes | Absolute path to app source code |
-| `command` | Yes | Command to start the app (`pnpm`, `npm`, `node`) |
-| `args` | Yes | Command arguments (`["dev"]`, `["start"]`) |
-| `requires_port` | No | If `true`, fail if preferred port is busy |
+| Field           | Required | Description                                      |
+| --------------- | -------- | ------------------------------------------------ |
+| `id`            | Yes      | Unique app identifier (lowercase, hyphens)       |
+| `name`          | Yes      | Display name                                     |
+| `icon`          | Yes      | Emoji icon                                       |
+| `port`          | Yes      | Preferred port (auto-incremented if busy)        |
+| `path`          | Yes      | Absolute path to app source code                 |
+| `command`       | Yes      | Command to start the app (`pnpm`, `npm`, `node`) |
+| `args`          | Yes      | Command arguments (`["dev"]`, `["start"]`)       |
+| `requires_port` | No       | If `true`, fail if preferred port is busy        |
 
 ### Port Assignment
 
@@ -152,12 +158,12 @@ Each workspace has a `config.json` that lists registered apps:
 
 ### Workspace Fields
 
-| Field | Description |
-|-------|-------------|
-| `id` | Unique workspace identifier |
-| `name` | Display name |
-| `color` | Hex color for visual distinction |
-| `createdAt` | ISO timestamp |
+| Field       | Description                      |
+| ----------- | -------------------------------- |
+| `id`        | Unique workspace identifier      |
+| `name`      | Display name                     |
+| `color`     | Hex color for visual distinction |
+| `createdAt` | ISO timestamp                    |
 
 ## Environment Variable Layering
 
@@ -180,14 +186,14 @@ COMPANY_API_KEY=secret         # Work-only
 
 When Moldable starts an app, it sets these environment variables:
 
-| Variable | Description |
-|----------|-------------|
-| `MOLDABLE_APP_ID` | The app's unique identifier |
-| `MOLDABLE_PORT` | Assigned port number |
-| `PORT` | Same as MOLDABLE_PORT (for framework compatibility) |
-| `MOLDABLE_WORKSPACE_ID` | Active workspace ID |
-| `MOLDABLE_HOME` | Path to `~/.moldable` |
-| `MOLDABLE_APP_DATA_DIR` | Full path to app's data directory |
+| Variable                | Description                                         |
+| ----------------------- | --------------------------------------------------- |
+| `MOLDABLE_APP_ID`       | The app's unique identifier                         |
+| `MOLDABLE_PORT`         | Assigned port number                                |
+| `PORT`                  | Same as MOLDABLE_PORT (for framework compatibility) |
+| `MOLDABLE_WORKSPACE_ID` | Active workspace ID                                 |
+| `MOLDABLE_HOME`         | Path to `~/.moldable`                               |
+| `MOLDABLE_APP_DATA_DIR` | Full path to app's data directory                   |
 
 ## Modifying Configuration
 
@@ -208,7 +214,7 @@ config.apps.push({
   port: 3010,
   path: '/Users/rob/.moldable/shared/apps/my-app',
   command: 'pnpm',
-  args: ['dev']
+  args: ['dev'],
 })
 
 // Save
@@ -220,7 +226,7 @@ await writeFile(configPath, JSON.stringify(config, null, 2))
 Remove from workspace config (keeps code):
 
 ```typescript
-config.apps = config.apps.filter(app => app.id !== 'my-app')
+config.apps = config.apps.filter((app) => app.id !== 'my-app')
 await writeFile(configPath, JSON.stringify(config, null, 2))
 ```
 

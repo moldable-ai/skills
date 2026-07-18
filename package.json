@@ -2,6 +2,7 @@
   "name": "moldable-skills",
   "private": true,
   "scripts": {
+    "check:native-hardware-parity": "node ./scripts/check-native-hardware-parity.mjs",
     "check:shebang-executable": "./scripts/check-shebang-executable.sh",
     "prepare": "husky"
   },
