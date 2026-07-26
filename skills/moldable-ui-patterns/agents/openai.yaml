@@ -1,0 +1,4 @@
+interface:
+  display_name: "Moldable UI Patterns"
+  short_description: "Design robust standalone-first Moldable app UI"
+  default_prompt: "Use $moldable-ui-patterns to design or review a polished standalone-window and embedded Moldable app interface."

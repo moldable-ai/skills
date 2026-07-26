@@ -26,25 +26,25 @@ src/server/static.ts
 
 ## Lint Rules Summary
 
-| Rule                      | Severity | Requirement                                                                                  |
-| ------------------------- | -------- | -------------------------------------------------------------------------------------------- |
-| `moldable-json-exists`    | Error    | `moldable.json` must exist                                                                   |
-| `moldable-json-valid`     | Error    | Manifest must be valid JSON                                                                  |
-| `moldable-json-fields`    | Error    | Manifest must include `name`, `icon`, `description`                                          |
-| `moldable-json-runtime`   | Error    | Manifest runtime must be `vite_hono`                                                         |
-| `vite-config-exists`      | Error    | `vite.config.ts` must exist                                                                  |
-| `hono-server-entry`       | Error    | `src/server/index.ts` must exist                                                             |
-| `vite-hmr-portless`       | Error    | `src/server/index.ts` must configure Vite HMR from `MOLDABLE_APP_URL`                        |
-| `moldable-dev-script`     | Error    | `scripts/moldable-dev.mjs` must exist                                                        |
-| `moldable-dev-syntax`     | Error    | Dev script must launch the Hono server with `tsx watch` and track `.moldable.instances.json` |
-| `package-json-dev-script` | Error    | `dev` script must use `node ./scripts/moldable-dev.mjs`                                      |
-| `today-route`             | Warning  | `src/server/app.ts` should expose `GET /api/moldable/today` (contributes to the Today view)  |
-| `health-route`            | Error    | `src/server/app.ts` must expose `/api/moldable/health`                                       |
-| `gitignore-valid`         | Error    | `.gitignore` must ignore `dist` and `node_modules`                                           |
-| `eslint-config-app`       | Error    | `eslint.config.js` must use `@moldable-ai/eslint-config/app`                                 |
+| Rule                      | Severity | Requirement                                                                                   |
+| ------------------------- | -------- | --------------------------------------------------------------------------------------------- |
+| `moldable-json-exists`    | Error    | `moldable.json` must exist                                                                    |
+| `moldable-json-valid`     | Error    | Manifest must be valid JSON                                                                   |
+| `moldable-json-fields`    | Error    | Manifest must include `name`, `icon`, `description`                                           |
+| `moldable-json-runtime`   | Error    | Manifest runtime must be `vite_hono`                                                          |
+| `vite-config-exists`      | Error    | `vite.config.ts` must exist                                                                   |
+| `hono-server-entry`       | Error    | `src/server/index.ts` must exist                                                              |
+| `vite-hmr-portless`       | Error    | `src/server/index.ts` must configure Vite HMR from `MOLDABLE_APP_URL`                         |
+| `moldable-dev-script`     | Error    | `scripts/moldable-dev.mjs` must exist                                                         |
+| `moldable-dev-syntax`     | Error    | Dev script must launch the Hono server with `tsx watch` and track `.moldable.instances.json`  |
+| `package-json-dev-script` | Error    | `dev` script must use `node ./scripts/moldable-dev.mjs`                                       |
+| `today-route`             | Warning  | `src/server/app.ts` should expose `GET /api/moldable/today` (contributes to the Today view)   |
+| `health-route`            | Error    | `src/server/app.ts` must expose `/api/moldable/health`                                        |
+| `gitignore-valid`         | Error    | `.gitignore` must ignore `dist` and `node_modules`                                            |
+| `eslint-config-app`       | Error    | `eslint.config.js` must use `@moldable-ai/eslint-config/app`                                  |
 | `no-localstorage`         | Warning  | Browser storage is an anti-pattern for app data/settings; use workspace-scoped server storage |
-| `workspace-provider`      | Error    | Client entry must use `WorkspaceProvider`                                                    |
-| `app-registered`          | Error    | App must be registered in workspace `config.json`                                            |
+| `workspace-provider`      | Error    | Client entry must use `WorkspaceProvider`                                                     |
+| `app-registered`          | Error    | App must be registered in workspace `config.json`                                             |
 
 ## Core Templates
 
@@ -63,7 +63,7 @@ src/server/static.ts
   "category": "custom",
   "tags": [],
   "moldableDependencies": {
-    "@moldable-ai/ui": "^0.2.6",
+    "@moldable-ai/ui": "^0.2.20",
     "@moldable-ai/storage": "^0.1.3"
   },
   "env": []
@@ -102,10 +102,16 @@ export default app;
 ```tsx
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { ThemeProvider, WorkspaceProvider } from "@moldable-ai/ui";
+import {
+  ThemeProvider,
+  WorkspaceProvider,
+  installMoldableFrameLifecycle,
+} from "@moldable-ai/ui";
 import { App } from "./app";
 import { QueryProvider } from "./query-provider";
 import "./globals.css";
+
+installMoldableFrameLifecycle();
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>

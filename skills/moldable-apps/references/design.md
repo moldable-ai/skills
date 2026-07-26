@@ -4,6 +4,12 @@ Use this reference before building or changing visible Moldable app UI. It is in
 
 Do not exclusively depend on example apps being installed. This file embeds the patterns to copy, but when Mail, Meetings, or DB Browser are present in `~/.moldable/shared/apps/` or `~/moldable-apps/`, inspect their main app UI before making comparable design changes.
 
+For component selection, authored app-shell primitives, and implementation
+checks, also read the sibling
+[`moldable-ui-patterns` skill](../moldable-ui-patterns/SKILL.md) when available.
+Use the component guides shipped with `@moldable-ai/ui`; this file owns product
+composition rather than duplicating every component API.
+
 ## Product Feel
 
 Moldable apps should feel like local, personal instruments: fast, quiet, specific, dense enough for repeated use, and shaped around the user's actual data. They are not websites, landing pages, demos, or SaaS dashboards.
@@ -36,7 +42,9 @@ If an answer is vague, simplify the app before designing. "Manage items" is too 
 - Use `@moldable-ai/ui` components and semantic colors.
 - Use Lucide icons for icon buttons.
 - Do not use the sparkle icon (Lucide `Sparkles` / ✨) as a generic "this is AI" marker. Every AI feature defaulting to a sparkle is meaningless and dated. Choose an icon that names the actual action — e.g. `Paintbrush`/`Palette`/`SwatchBook` for restyling or browsing styles, `Wand2` for a one-off edit/cleanup, `Languages` for translate, `Loader2` (spinning) for in-progress generation. Reserve a sparkle only when "make this sparkle/enhance" is literally the action, and even then prefer a more specific verb+icon.
-- All clickable `<button>` elements include `cursor-pointer` unless disabled.
+- Prefer the shared `Button`/`Toggle` families, which own pointer and disabled
+  cursor behavior. Any unavoidable raw clickable `<button>` includes
+  `cursor-pointer` unless disabled.
 - Do not use raw Tailwind color families like `bg-gray-100`, `text-zinc-900`, `bg-blue-500`.
 - Do not create a marketing landing page as the first screen.
 - Do not use visible instructional copy to explain obvious UI features.
@@ -44,12 +52,12 @@ If an answer is vague, simplify the app before designing. "Manage items" is too 
 - Do not add a separate chat input, chat panel, prompt box, or assistant conversation inside an app. Moldable already has desktop chat.
 - Do not wrap the whole app in cards. Use full-height surfaces, panes, lists, editors, and toolbars.
 - Do not nest cards.
-- Do not use decorative gradients, gradient text, glass cards, bokeh/orb backgrounds, oversized hero type, or repeated icon-card grids.
+- Do not use decorative gradients, gradient text, translucent content cards, bokeh/orb backgrounds, oversized hero type, or repeated icon-card grids. Adaptive material is for navigation and control chrome, not content.
 - Keep text within its container at all sizes. Use `min-w-0`, `truncate`, `line-clamp-*`, flexible grids, and stable dimensions.
 - Respect `--chat-safe-padding` anywhere content or controls can be hidden by the desktop chat.
 - App shells must be full height. Put scrolling on intentional inner regions, not on `body` or an accidental page wrapper.
-- Dialogs and popovers with substantial content must avoid the chat area; constrain their height with `--chat-safe-padding` and scroll their body content internally.
-- Never use native browser confirmations: no `confirm()`, `window.confirm()`, or host/global `.confirm(...)`. Use Moldable/shadcn `AlertDialog` for confirmations.
+- Dialogs, alert dialogs, and sheets with substantial content use their shared `*Body` scrolling regions so headers and actions remain visible within host safe areas.
+- Never use native browser confirmations: no `confirm()`, `window.confirm()`, or host/global `.confirm(...)`. Use `ConfirmDialog` for promise-backed consequential actions or `AlertDialog` for a custom static confirmation.
 
 ## Today Contribution
 
@@ -67,22 +75,26 @@ Choose one archetype. Do not invent a generic dashboard unless the app genuinely
 
 Every full app view should fill the webview. The root route/component should establish a full-height flex or grid shell, then make only the intended panes scroll.
 
-Use this shape unless the app has a strong reason not to:
+Start with `AppFrame` and its regions, then compose `Panel`, `PanelGroup`, and
+`Toolbar` from `@moldable-ai/ui` as needed:
 
 ```tsx
 export function App() {
   return (
-    <main className="bg-background text-foreground flex h-full min-h-0 overflow-hidden">
-      <section className="flex h-full min-h-0 flex-1 flex-col overflow-hidden">
-        <header className="border-border/70 flex h-9 shrink-0 items-center border-b px-3">
-          {/* compact app chrome */}
-        </header>
-        <div className="min-h-0 flex-1 overflow-y-auto pb-[calc(var(--chat-safe-padding,0px)+1rem)]">
-          {/* scrollable content */}
-        </div>
-      </section>
-    </main>
-  )
+    <AppFrame>
+      <AppFrameTitlebar material="regular">
+        <AppFrameToolbar>{/* identity and window-local actions */}</AppFrameToolbar>
+      </AppFrameTitlebar>
+      <AppFrameContent>
+        <PanelGroup>
+          <Panel>
+            <Toolbar>{/* compact pane chrome */}</Toolbar>
+            <PanelContent>{/* scrollable content */}</PanelContent>
+          </Panel>
+        </PanelGroup>
+      </AppFrameContent>
+    </AppFrame>
+  );
 }
 ```
 
@@ -106,9 +118,13 @@ Rules:
 - do not render a large app-name header just to identify the app; Moldable desktop chrome already identifies the active app
 - top bars should name the current scope, selected object, mode, or action, not restate the app name
 - use `min-h-0 flex-1 overflow-y-auto` or `overflow-auto` only on scroll regions
-- add chat safe padding to each scroll region that reaches the bottom
+- let `AppFrameContent` consume chat-safe padding; for a custom owner, apply it
+  once to the bottom-most scrolling region
 - add extra safe padding when a fixed dock is present
 - do not rely on the document/body scroll for the main app
+- use `Material`/`MaterialGroup` only for titlebars, toolbars, menus, popovers,
+  and compact controls; keep the working canvas, forms, tables, and calendars
+  opaque
 - empty states inside a scrollable or full-height pane still need bottom chat padding if they can be covered
 - tables, object browsers, inspectors, and result panes need their own safe bottom padding because they often scroll independently
 
@@ -212,14 +228,24 @@ Pattern:
 ```tsx
 <div
   className="pointer-events-none fixed inset-x-0 z-50 flex justify-center px-4"
-  style={{ bottom: 'calc(var(--chat-safe-padding, 0px) + 1.5rem)' }}
+  style={{ bottom: "calc(var(--chat-safe-padding, 0px) + 1.5rem)" }}
 >
   <div className="bg-background/95 shadow-foreground/10 pointer-events-auto flex h-14 max-w-[calc(100vw-2rem)] items-center gap-1 rounded-full border px-2 shadow-xl backdrop-blur-xl">
-    <Button type="button" variant="ghost" size="icon" className="size-10 cursor-pointer rounded-full" aria-label="Archive">
+    <Button
+      type="button"
+      variant="ghost"
+      size="icon"
+      className="size-10 cursor-pointer rounded-full"
+      aria-label="Archive"
+    >
       <Archive className="size-4" />
     </Button>
     <div className="bg-border mx-1 h-7 w-px" />
-    <Button type="button" size="sm" className="h-10 cursor-pointer gap-2 rounded-full px-5">
+    <Button
+      type="button"
+      size="sm"
+      className="h-10 cursor-pointer gap-2 rounded-full px-5"
+    >
       <Reply className="size-4" />
       Reply
     </Button>
@@ -318,7 +344,7 @@ Use `MarkdownEditor` from `@moldable-ai/editor` for markdown notes, meeting note
 Required setup:
 
 ```css
-@import '@moldable-ai/editor/styles';
+@import "@moldable-ai/editor/styles";
 
 @source '../../node_modules/@moldable-ai/editor/dist/**/*.{js,jsx,ts,tsx}';
 ```
@@ -326,7 +352,7 @@ Required setup:
 Basic pattern:
 
 ```tsx
-import { MarkdownEditor } from '@moldable-ai/editor'
+import { MarkdownEditor } from "@moldable-ai/editor";
 
 <MarkdownEditor
   value={notes}
@@ -337,7 +363,7 @@ import { MarkdownEditor } from '@moldable-ai/editor'
   className="app-document-editor"
   contentClassName="app-document-content"
   hideMarkdownHint
-/>
+/>;
 ```
 
 Document styling pattern:
@@ -367,11 +393,11 @@ Document styling pattern:
   @apply my-2 pl-7;
 }
 
-.app-document-content [data-lexical-text='true'] {
+.app-document-content [data-lexical-text="true"] {
   letter-spacing: 0;
 }
 
-.app-document-editor [data-lexical-editor='true'] + div {
+.app-document-editor [data-lexical-editor="true"] + div {
   @apply text-muted-foreground/55 pointer-events-none absolute inset-0 flex items-start px-0 py-3 text-[1.25rem] leading-[1.7];
 }
 ```
@@ -400,75 +426,77 @@ pnpm add @monaco-editor/react monaco-editor
 Use Monaco inside a full-height pane:
 
 ```tsx
-import Editor, { type Monaco } from '@monaco-editor/react'
-import { useCallback, useMemo } from 'react'
-import { Spinner, useTheme } from '@moldable-ai/ui'
-import type { editor } from 'monaco-editor'
+import Editor, { type Monaco } from "@monaco-editor/react";
+import { useCallback, useMemo } from "react";
+import { Spinner, useTheme } from "@moldable-ai/ui";
+import type { editor } from "monaco-editor";
 
 export function CodeEditor({
   value,
   language,
   onChange,
 }: {
-  value: string
-  language: string
-  onChange: (value: string) => void
+  value: string;
+  language: string;
+  onChange: (value: string) => void;
 }) {
-  const { resolvedTheme } = useTheme()
-  const theme = resolvedTheme === 'dark' ? 'moldable-code-dark' : 'moldable-code-light'
+  const { resolvedTheme } = useTheme();
+  const theme =
+    resolvedTheme === "dark" ? "moldable-code-dark" : "moldable-code-light";
 
   const beforeMount = useCallback((monaco: Monaco) => {
-    monaco.editor.defineTheme('moldable-code-dark', {
-      base: 'vs-dark',
+    monaco.editor.defineTheme("moldable-code-dark", {
+      base: "vs-dark",
       inherit: true,
       rules: [],
       colors: {
-        'editor.background': '#181818',
-        'editor.foreground': '#f4f4f5',
-        'editorLineNumber.foreground': '#71717a',
-        'editorCursor.foreground': '#f97316',
-        'editor.lineHighlightBackground': '#27272a66',
-        'editor.selectionBackground': '#f973163d',
-        'editor.inactiveSelectionBackground': '#71717a33',
+        "editor.background": "#181818",
+        "editor.foreground": "#f4f4f5",
+        "editorLineNumber.foreground": "#71717a",
+        "editorCursor.foreground": "#f97316",
+        "editor.lineHighlightBackground": "#27272a66",
+        "editor.selectionBackground": "#f973163d",
+        "editor.inactiveSelectionBackground": "#71717a33",
       },
-    })
-    monaco.editor.defineTheme('moldable-code-light', {
-      base: 'vs',
+    });
+    monaco.editor.defineTheme("moldable-code-light", {
+      base: "vs",
       inherit: true,
       rules: [],
       colors: {
-        'editor.background': '#fafafa',
-        'editor.foreground': '#18181b',
-        'editorLineNumber.foreground': '#a1a1aa',
-        'editorCursor.foreground': '#f97316',
-        'editor.lineHighlightBackground': '#e4e4e766',
-        'editor.selectionBackground': '#f9731633',
-        'editor.inactiveSelectionBackground': '#a1a1aa33',
+        "editor.background": "#fafafa",
+        "editor.foreground": "#18181b",
+        "editorLineNumber.foreground": "#a1a1aa",
+        "editorCursor.foreground": "#f97316",
+        "editor.lineHighlightBackground": "#e4e4e766",
+        "editor.selectionBackground": "#f9731633",
+        "editor.inactiveSelectionBackground": "#a1a1aa33",
       },
-    })
-  }, [])
+    });
+  }, []);
 
   const options = useMemo<editor.IStandaloneEditorConstructionOptions>(
     () => ({
       automaticLayout: true,
       bracketPairColorization: { enabled: true },
-      fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace',
+      fontFamily:
+        'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace',
       fontSize: 13,
       glyphMargin: false,
       lineDecorationsWidth: 22,
-      lineNumbers: 'on',
+      lineNumbers: "on",
       lineNumbersMinChars: 4,
       minimap: { enabled: false },
       overviewRulerBorder: false,
       padding: { top: 12, bottom: 12 },
-      renderLineHighlight: 'line',
+      renderLineHighlight: "line",
       scrollBeyondLastLine: false,
       smoothScrolling: true,
       tabSize: 2,
-      wordWrap: 'on',
+      wordWrap: "on",
     }),
     [],
-  )
+  );
 
   return (
     <Editor
@@ -477,7 +505,7 @@ export function CodeEditor({
       theme={theme}
       value={value}
       beforeMount={beforeMount}
-      onChange={(nextValue) => onChange(nextValue ?? '')}
+      onChange={(nextValue) => onChange(nextValue ?? "")}
       loading={
         <div className="bg-background flex h-full items-center justify-center">
           <Spinner className="text-muted-foreground size-5" />
@@ -485,7 +513,7 @@ export function CodeEditor({
       }
       options={options}
     />
-  )
+  );
 }
 ```
 
@@ -558,18 +586,19 @@ Use safe padding:
 - tables or inspectors: `pb-[var(--chat-safe-padding,0px)]`
 - object browsers and side panes: `pb-[calc(var(--chat-safe-padding,0px)+1rem)]`
 
-Dialogs must also avoid the chat area. Do not let a centered dialog extend behind the chat overlay. For dialogs with forms, lists, or SQL/history content, make the dialog a constrained flex column and put scrolling inside the body:
+Shared dialogs already account for host and chat safe areas. Put long content
+inside the component's body region and keep the header and footer outside it:
 
 ```tsx
-<DialogContent className="top-[calc((100dvh-var(--chat-safe-padding,0px))/2)] flex max-h-[calc(100dvh-var(--chat-safe-padding,0px)-2rem)] flex-col gap-0 overflow-hidden p-0 sm:max-w-lg">
-  <DialogHeader className="px-6 pb-4 pt-6 pr-12">
+<DialogContent size="lg">
+  <DialogHeader>
     <DialogTitle>New connection</DialogTitle>
   </DialogHeader>
-  <form className="flex min-h-0 flex-col">
-    <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-6 pb-4">
+  <form className="contents">
+    <DialogBody>
       {/* fields */}
-    </div>
-    <DialogFooter className="border-border/70 shrink-0 border-t px-6 py-4">
+    </DialogBody>
+    <DialogFooter>
       {/* actions */}
     </DialogFooter>
   </form>
@@ -578,25 +607,26 @@ Dialogs must also avoid the chat area. Do not let a centered dialog extend behin
 
 Dialog rules:
 
-- use the safe `top` and `max-h` calculation for any dialog that may be taller than a small confirmation
-- use `flex max-h-* overflow-hidden p-0` on `DialogContent`
-- keep header and footer `shrink-0`
-- put `overflow-y-auto` on the dialog body, not the whole page
+- use `DialogBody`, `AlertDialogBody`, or `SheetBody` as the sole scrolling
+  region
+- keep headers and footers outside the body
 - keep destructive confirmations compact, but still verify they do not sit under the chat overlay
-- destructive confirmations must use `AlertDialog`, not `confirm()`, `window.confirm()`, or `.confirm(...)`; native blocking dialogs are unreliable in Moldable desktop webviews and especially inside Radix context-menu/dropdown selection handlers
+- promise-backed destructive confirmations use `ConfirmDialog`; custom static
+  confirmations use `AlertDialog`, never a native blocking confirmation
 - when a destructive action starts from a context menu or dropdown, let the menu selection finish, store the pending target in state, then open the `AlertDialog` with the exact object name or selected count before executing
-- large command/history/import/export dialogs should use `w-[min(...)] max-w-none` plus the same safe max height pattern
+- large command/history/import/export dialogs use the shared `size` contract
+  and body scrolling instead of app-local viewport calculations
 
 Set chat instructions when app state helps the agent:
 
 ```ts
 window.parent.postMessage(
   {
-    type: 'moldable:set-chat-instructions',
+    type: "moldable:set-chat-instructions",
     text: `User is viewing ${objectName}. Current selection: ${selectionSummary}. Prefer app APIs for changes.`,
   },
-  '*',
-)
+  "*",
+);
 ```
 
 Good chat context is specific and action-oriented:
@@ -668,11 +698,11 @@ Use OKLCH only when custom color is needed, for example deterministic avatars or
 
 ```ts
 const palette = [
-  'oklch(0.7 0.12 30)',
-  'oklch(0.72 0.12 85)',
-  'oklch(0.68 0.11 150)',
-  'oklch(0.68 0.1 200)',
-]
+  "oklch(0.7 0.12 30)",
+  "oklch(0.72 0.12 85)",
+  "oklch(0.68 0.11 150)",
+  "oklch(0.68 0.1 200)",
+];
 ```
 
 ## Typography

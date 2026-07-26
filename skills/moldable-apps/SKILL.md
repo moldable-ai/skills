@@ -33,15 +33,15 @@ This skill provides comprehensive knowledge for building and modifying apps with
 
 ```typescript
 scaffoldApp({
-  appId: 'expense-tracker', // lowercase, hyphens only
-  name: 'Expense Tracker', // Display name
-  icon: '💰', // Emoji icon
-  description: 'Track expenses and generate reports',
+  appId: "expense-tracker", // lowercase, hyphens only
+  name: "Expense Tracker", // Display name
+  icon: "💰", // Emoji icon
+  description: "Track expenses and generate reports",
   extraDependencies: {
     // Optional npm packages
-    zod: '^3.0.0',
+    zod: "^3.0.0",
   },
-})
+});
 ```
 
 **After scaffolding**, customize:
@@ -128,9 +128,10 @@ Read these for in-depth guidance:
 
 ### Implementation Patterns
 
-- [references/design.md](references/design.md) — Moldable app design system for full app layouts, state handling, density, copy, motion, and UI polish. Read this before visible UI work.
+- [references/design.md](references/design.md) — Moldable product design guidance for app archetypes, state handling, density, copy, motion, and UI polish. Read this before visible UI work.
 - [references/today.md](references/today.md) — The **Today** home view: implementing `GET /api/moldable/today`, item kinds, actions, and the "quiet by default" rules.
-- [references/ui.md](references/ui.md) — **@moldable-ai/ui components**, shadcn/ui, themes, rich text editor, Cmd+K app commands
+- [references/ui.md](references/ui.md) — **@moldable-ai/ui** setup, component categories, app-safe selection, themes, rich text, and Cmd+K commands
+- [../moldable-ui-patterns/SKILL.md](../moldable-ui-patterns/SKILL.md) — Focused component-selection and macOS-quality workflow. Read for visible UI creation, refactoring, or audits when this sibling skill is available.
 - [references/storage-patterns.md](references/storage-patterns.md) — Filesystem storage, React Query, workspace-aware APIs
 - [references/browser-storage-audit.md](references/browser-storage-audit.md) — Current browser storage usage and migration guidance
 - [references/desktop-apis.md](references/desktop-apis.md) — Router for desktop integration APIs
@@ -162,31 +163,44 @@ Read these for in-depth guidance:
 
 ## Essential Patterns
 
-For any visible app UI, read [references/design.md](references/design.md) before editing `src/client/app.tsx` or client components. The design reference is self-contained and does not require other apps to be installed.
+For any visible app UI, read [references/design.md](references/design.md) before editing `src/client/app.tsx` or client components. Also use the focused [moldable-ui-patterns skill](../moldable-ui-patterns/SKILL.md) when available; it routes component choice, app-shell composition, keyboard/accessibility checks, and per-component guidance.
 
 ### 1. UI Components (@moldable-ai/ui)
 
-**Always use `@moldable-ai/ui`** for all UI work. It includes shadcn/ui components, theme support, and a rich text editor.
+**Always use `@moldable-ai/ui`** for established interactive controls and app structure. Semantic HTML and Tailwind layout utilities remain appropriate for layout gaps the package does not cover.
 
 ```tsx
 // Import components from @moldable-ai/ui (NOT from shadcn directly)
 // For rich text editing
-import { MarkdownEditor } from '@moldable-ai/editor'
+import { MarkdownEditor } from "@moldable-ai/editor";
 import {
+  AppFrame,
+  AppFrameContent,
+  AppFrameTitlebar,
+  AppFrameToolbar,
   Button,
   Card,
   CodeBlock,
+  ConfirmDialog,
+  DatePicker,
   Dialog,
   Input,
+  Inspector,
   Markdown,
+  Material,
+  Panel,
   Select,
+  SplitView,
   Tabs,
+  Text,
   ThemeProvider,
+  Toolbar,
   WorkspaceProvider,
   downloadFile,
+  installMoldableFrameLifecycle,
   sendToMoldable,
   useTheme,
-} from '@moldable-ai/ui'
+} from "@moldable-ai/ui";
 ```
 
 **Use semantic colors only:**
@@ -200,15 +214,22 @@ import {
 <div className="bg-white text-gray-900" />
 ```
 
-See [references/ui.md](references/ui.md) for complete component list and usage.
+See [references/ui.md](references/ui.md) for the categorized surface and the
+package-local component-guide location. Confirm an export before using it, then
+read the guide for each selected family.
+
+Install the shared frame lifecycle once in the client entry and begin full app
+views with `AppFrame`. Use adaptive `Material` only for navigation and control
+chrome; keep primary content opaque. Do not add app-local chat-safe-area
+listeners.
 
 For native hardware UI (camera, mic, location, serial, BLE, …), use the
 prebuilt hardware components from `@moldable-ai/ui` — `CameraPreview`,
 `MicrophoneMeter`, `LocationPanel`, `SerialConsole`, `CapabilityMatrix`, etc. —
 instead of building your own on the imperative helpers. They ship the
 permission flows, device pickers, and live/error states already styled. Full
-list in [references/ui.md](references/ui.md) § Hardware Components; read the
-component source to discover props.
+list in [references/ui.md](references/ui.md) § Native capability components;
+use the package declarations and component guide rather than guessing props.
 
 ### 2. Workspace-Aware Storage
 
@@ -216,18 +237,18 @@ All apps **must** isolate data per workspace:
 
 ```tsx
 // Server - extract workspace from request
-import { getAppDataDir, getWorkspaceFromRequest } from '@moldable-ai/storage'
+import { getAppDataDir, getWorkspaceFromRequest } from "@moldable-ai/storage";
 
 // Client - use workspaceId in query keys
-const { workspaceId, fetchWithWorkspace } = useWorkspace()
+const { workspaceId, fetchWithWorkspace } = useWorkspace();
 const { data } = useQuery({
-  queryKey: ['items', workspaceId], // ← Include workspace!
-  queryFn: () => fetchWithWorkspace('/api/items').then((r) => r.json()),
-})
+  queryKey: ["items", workspaceId], // ← Include workspace!
+  queryFn: () => fetchWithWorkspace("/api/items").then((r) => r.json()),
+});
 
 export async function GET(request: Request) {
-  const workspaceId = getWorkspaceFromRequest(request)
-  const dataDir = getAppDataDir(workspaceId)
+  const workspaceId = getWorkspaceFromRequest(request);
+  const dataDir = getAppDataDir(workspaceId);
   // Read/write files in dataDir
 }
 ```
@@ -239,30 +260,30 @@ Apps communicate with Moldable desktop via postMessage:
 ```typescript
 // Open external URL
 window.parent.postMessage(
-  { type: 'moldable:open-url', url: 'https://...' },
-  '*',
-)
+  { type: "moldable:open-url", url: "https://..." },
+  "*",
+);
 
 // Show file in Finder
 window.parent.postMessage(
-  { type: 'moldable:show-in-folder', path: '/path/to/file' },
-  '*',
-)
+  { type: "moldable:show-in-folder", path: "/path/to/file" },
+  "*",
+);
 
 // Pre-populate chat input
 window.parent.postMessage(
-  { type: 'moldable:set-chat-input', text: 'Help me...' },
-  '*',
-)
+  { type: "moldable:set-chat-input", text: "Help me..." },
+  "*",
+);
 
 // Provide context to AI
 window.parent.postMessage(
   {
-    type: 'moldable:set-chat-instructions',
-    text: 'User is viewing meeting #123...',
+    type: "moldable:set-chat-instructions",
+    text: "User is viewing meeting #123...",
   },
-  '*',
-)
+  "*",
+);
 ```
 
 For public, shareable static outputs such as slides, meeting notes, reports,
@@ -276,13 +297,13 @@ Required providers for Moldable apps:
 
 ```tsx
 // src/client/main.tsx
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import { ThemeProvider, WorkspaceProvider } from '@moldable-ai/ui'
-import { App } from './app'
-import { QueryProvider } from './query-provider'
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import { ThemeProvider, WorkspaceProvider } from "@moldable-ai/ui";
+import { App } from "./app";
+import { QueryProvider } from "./query-provider";
 
-createRoot(document.getElementById('root')!).render(
+createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <ThemeProvider>
       <WorkspaceProvider>
@@ -292,7 +313,7 @@ createRoot(document.getElementById('root')!).render(
       </WorkspaceProvider>
     </ThemeProvider>
   </StrictMode>,
-)
+);
 ```
 
 ### 5. Adding Dependencies
@@ -301,9 +322,9 @@ Use `sandbox: false` for package manager commands:
 
 ```typescript
 await runCommand({
-  command: 'cd ~/.moldable/shared/apps/my-app && pnpm add zod',
+  command: "cd ~/.moldable/shared/apps/my-app && pnpm add zod",
   sandbox: false, // Required for network access
-})
+});
 ```
 
 ## App Management Tools
