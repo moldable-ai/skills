@@ -27,6 +27,21 @@ This skill provides comprehensive knowledge for building and modifying apps with
 - **Dev Reloading**: Vite client HMR via Portless-aware `MOLDABLE_APP_URL`; Hono server reloads via `tsx watch`
 - **Package Manager**: pnpm
 
+## UI Package Contract
+
+This skill targets **`@moldable-ai/ui` 0.2.22**. Pin that exact version in
+generated app manifests. Before UI work, confirm the installed package version;
+if it differs, use the public exports and guides shipped with that installed
+version rather than assuming this skill's target APIs still apply.
+
+The package owns component APIs. Treat its root `src/index.ts` and
+`src/components/ui/index.ts` barrels as the public surface, and read the
+version-matched colocated guide for every selected component family. This skill
+routes component choice and composition; it does not replace those guides with
+copied prop tables. If the needed primitive is missing, **report the package
+gap**. Do not hand-roll a competing shared control or deep-import private
+source.
+
 ## Creating Apps
 
 **ALWAYS use the `scaffoldApp` tool** — never create app files manually.
@@ -47,12 +62,16 @@ scaffoldApp({
 **After scaffolding**, customize:
 
 - `src/client/app.tsx` — Main app view
-- `src/server/app.ts` or `src/server/routes/` — Hono API routes (including `/api/moldable/health` and `/api/moldable/today`)
+- `src/server/app.ts` or `src/server/routes/` — Hono API routes (including health, Today, and the drive API)
 - `src/client/components/` or `src/components/` — React components
 
 ### Today contribution
 
 The home screen is the host-rendered **Today** view. Apps participate by implementing `GET /api/moldable/today`, which returns items/resume only when something genuinely needs the user (quiet by default). See [references/today.md](references/today.md).
+
+### Drive contract
+
+Every new app must be drivable by chat and voice from day one. Declare an `<appId>.drive` capability with fully prefixed `<appId>.ui.describe`, `<appId>.ui.navigate`, and `<appId>.ui.read` scopes; implement the workspace-scoped UI-intent flow; and listen for `moldable:app-api-changed` in the client. Add model-readable signature actions for the app's important verbs. Follow [references/app-to-app-communication.md](references/app-to-app-communication.md#drive-contract-voice--chat-steering) for the complete contract and Plants reference code.
 
 ### Scheduled agent work
 
@@ -130,13 +149,13 @@ Read these for in-depth guidance:
 
 - [references/design.md](references/design.md) — Moldable product design guidance for app archetypes, state handling, density, copy, motion, and UI polish. Read this before visible UI work.
 - [references/today.md](references/today.md) — The **Today** home view: implementing `GET /api/moldable/today`, item kinds, actions, and the "quiet by default" rules.
-- [references/ui.md](references/ui.md) — **@moldable-ai/ui** setup, component categories, app-safe selection, themes, rich text, and Cmd+K commands
+- [references/ui.md](references/ui.md) — **@moldable-ai/ui 0.2.22** source routing, app shell, component decisions, standalone windows, fallback-first host services, themes, and commands
 - [../moldable-ui-patterns/SKILL.md](../moldable-ui-patterns/SKILL.md) — Focused component-selection and macOS-quality workflow. Read for visible UI creation, refactoring, or audits when this sibling skill is available.
 - [references/storage-patterns.md](references/storage-patterns.md) — Filesystem storage, React Query, workspace-aware APIs
 - [references/browser-storage-audit.md](references/browser-storage-audit.md) — Current browser storage usage and migration guidance
 - [references/desktop-apis.md](references/desktop-apis.md) — Router for desktop integration APIs
 - [references/desktop-message-apis.md](references/desktop-message-apis.md) — Window, chat, file, and artifact postMessage APIs
-- [references/native-apis.md](references/native-apis.md) — Typed native capability API overview and usage rules; **hardware UI components** (CameraPreview, SerialConsole, LocationPanel, …) are listed in [references/ui.md](references/ui.md)
+- [references/native-apis.md](references/native-apis.md) — Typed native capability API overview and usage rules; route native-capability UI through [references/ui.md](references/ui.md)
 - [references/native-api-support.md](references/native-api-support.md) — Native capability support matrix and permission summary
 - [references/native-api-permissions.md](references/native-api-permissions.md) — `nativeHardware` declarations and per-app workspace grants
 - [references/native-api-media.md](references/native-api-media.md) — Camera, microphone, display capture, macOS permission status/request/diagnostics, and system audio
@@ -165,43 +184,32 @@ Read these for in-depth guidance:
 
 For any visible app UI, read [references/design.md](references/design.md) before editing `src/client/app.tsx` or client components. Also use the focused [moldable-ui-patterns skill](../moldable-ui-patterns/SKILL.md) when available; it routes component choice, app-shell composition, keyboard/accessibility checks, and per-component guidance.
 
+### Required Design-System Workflow
+
+1. **Identify the shell archetype.** Name the app's primary object and choose
+   the full-height, list-detail, document/editor, paneled workspace, focused
+   dock, or timeline shape from [references/design.md](references/design.md).
+2. **Select components by intent.** Use the short decision tables in
+   [references/ui.md](references/ui.md); start with `AppFrame` and compose
+   shared pane, toolbar, inspector, feedback, and control families.
+3. **Read the selected guides.** Confirm every named export in the public
+   barrels, then read each selected component family's version-matched
+   colocated guide. The guide owns props, states, keyboard behavior, and
+   composition details.
+4. **Inventory states before implementation.** Cover every applicable loading,
+   empty, error, disabled, selected, invalid, auth, permission, busy, offline,
+   and fallback state.
+5. **Implement with the shared system.** Use the shared shell, semantic tokens,
+   density, materials, and host-service/native-capability hooks. If a needed
+   primitive is absent, report it instead of cloning or hand-rolling it.
+6. **Verify the complete view.** Check keyboard-only use and visible focus,
+   light and dark themes, narrow width, and standalone/embedded safe areas.
+   Also check reduced motion, reduced transparency, and increased contrast when
+   material or motion is present.
+
 ### 1. UI Components (@moldable-ai/ui)
 
 **Always use `@moldable-ai/ui`** for established interactive controls and app structure. Semantic HTML and Tailwind layout utilities remain appropriate for layout gaps the package does not cover.
-
-```tsx
-// Import components from @moldable-ai/ui (NOT from shadcn directly)
-// For rich text editing
-import { MarkdownEditor } from "@moldable-ai/editor";
-import {
-  AppFrame,
-  AppFrameContent,
-  AppFrameTitlebar,
-  AppFrameToolbar,
-  Button,
-  Card,
-  CodeBlock,
-  ConfirmDialog,
-  DatePicker,
-  Dialog,
-  Input,
-  Inspector,
-  Markdown,
-  Material,
-  Panel,
-  Select,
-  SplitView,
-  Tabs,
-  Text,
-  ThemeProvider,
-  Toolbar,
-  WorkspaceProvider,
-  downloadFile,
-  installMoldableFrameLifecycle,
-  sendToMoldable,
-  useTheme,
-} from "@moldable-ai/ui";
-```
 
 **Use semantic colors only:**
 
@@ -214,22 +222,21 @@ import {
 <div className="bg-white text-gray-900" />
 ```
 
-See [references/ui.md](references/ui.md) for the categorized surface and the
-package-local component-guide location. Confirm an export before using it, then
-read the guide for each selected family.
+See [references/ui.md](references/ui.md) for source routing, component
+decisions, standalone windows, and fallback-first host services. Confirm an
+export before using it, then read the guide for each selected family.
 
 Install the shared frame lifecycle once in the client entry and begin full app
 views with `AppFrame`. Use adaptive `Material` only for navigation and control
 chrome; keep primary content opaque. Do not add app-local chat-safe-area
 listeners.
 
-For native hardware UI (camera, mic, location, serial, BLE, …), use the
-prebuilt hardware components from `@moldable-ai/ui` — `CameraPreview`,
-`MicrophoneMeter`, `LocationPanel`, `SerialConsole`, `CapabilityMatrix`, etc. —
-instead of building your own on the imperative helpers. They ship the
-permission flows, device pickers, and live/error states already styled. Full
-list in [references/ui.md](references/ui.md) § Native capability components;
-use the package declarations and component guide rather than guessing props.
+For native capability UI (camera, microphone, location, serial, Bluetooth,
+and related services), start with the package's
+`src/components/native-capabilities/` public surface instead of building UI
+directly on the imperative helpers. Route through
+[references/ui.md](references/ui.md) and the package README rather than
+guessing exports or props.
 
 ### 2. Workspace-Aware Storage
 
@@ -299,9 +306,15 @@ Required providers for Moldable apps:
 // src/client/main.tsx
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { ThemeProvider, WorkspaceProvider } from "@moldable-ai/ui";
+import {
+  ThemeProvider,
+  WorkspaceProvider,
+  installMoldableFrameLifecycle,
+} from "@moldable-ai/ui";
 import { App } from "./app";
 import { QueryProvider } from "./query-provider";
+
+installMoldableFrameLifecycle();
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>

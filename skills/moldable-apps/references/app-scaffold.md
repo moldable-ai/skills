@@ -46,6 +46,18 @@ src/server/static.ts
 | `workspace-provider`      | Error    | Client entry must use `WorkspaceProvider`                                                     |
 | `app-registered`          | Error    | App must be registered in workspace `config.json`                                             |
 
+## Required Runtime Contracts
+
+Every new app ships health, Today, and drive support from day one:
+
+- `GET /api/moldable/health`;
+- `GET /api/moldable/today`, quiet when nothing needs attention;
+- an `<appId>.drive` capability with fully prefixed `<appId>.ui.describe`, `<appId>.ui.navigate`, and `<appId>.ui.read` scopes;
+- workspace-scoped UI-intent storage plus `GET` and `DELETE /api/moldable/ui-intent`;
+- client consumption on mount and a filtered `moldable:app-api-changed` listener that refreshes app data and navigation intents.
+
+Add model-readable signature actions for the app's important verbs. See [app-to-app-communication.md](app-to-app-communication.md#drive-contract-voice--chat-steering) for the complete contract, Plants reference code, and test expectations.
+
 ## Core Templates
 
 ### `moldable.json`
@@ -63,7 +75,7 @@ src/server/static.ts
   "category": "custom",
   "tags": [],
   "moldableDependencies": {
-    "@moldable-ai/ui": "^0.2.20",
+    "@moldable-ai/ui": "0.2.22",
     "@moldable-ai/storage": "^0.1.3"
   },
   "env": []
