@@ -4,7 +4,7 @@
 the web geolocation shape, but its native options are intentionally bounded. It
 does not imply background tracking.
 
-Declare `location` in `nativeHardware` before using this helper. The
+Declare `location` in `nativeCapabilities` before using this helper. The
 declaration delegates geolocation to the iframe; it does not replace user or OS
 permission.
 
@@ -18,11 +18,11 @@ import {
   getMoldableCurrentPosition,
   getMoldableLocationAuthorizationStatus,
   getMoldableNativeCapabilities,
-  supportsNativeHardwareCapability,
+  supportsNativeCapability,
 } from "@moldable-ai/ui";
 
 const native = await getMoldableNativeCapabilities();
-if (!supportsNativeHardwareCapability(native, "location")) return;
+if (!supportsNativeCapability(native, "location")) return;
 
 // This read does not request a position or show an OS prompt.
 const permission = await getMoldableLocationAuthorizationStatus();
@@ -60,10 +60,11 @@ current macOS state without creating a location request or prompting. A
 `granted` authorization can still be unusable while Location Services are
 disabled, so inspect both `authorization` and `servicesEnabled`.
 
-Native requests require the app to be visible, a fresh user action, and an
-approved `native-hardware.location` App Access grant. The operating system can
-then present its own location prompt. Keep the call directly inside a click or
-keyboard handler so the original user activation is preserved.
+Native requests require the app to be visible and an approved
+`native-capabilities.location` App Access grant. Request from a direct click or
+keyboard action: a first-time App Access grant and the operating system can
+each present approval UI, and user activation must be preserved for those
+flows.
 
 The read-only authorization-status helper still requires a live, visible,
 trusted app view, but it does not require an App Access grant or fresh user

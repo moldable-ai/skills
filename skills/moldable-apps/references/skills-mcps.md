@@ -58,7 +58,8 @@ Use this skill when dealing with X.
 
 ## References
 
-See [references/detailed-guide.md](references/detailed-guide.md) for more.
+Add supporting guides under this skill's `references/` directory and link only
+the files that ship with the skill.
 ```
 
 ### Executable Skills (skill.json)
@@ -220,12 +221,12 @@ server.setRequestHandler('tools/list', async () => ({
 
 server.setRequestHandler('tools/call', async (request) => {
   const { name, arguments: args } = request.params
-  
+
   if (name === 'get_data') {
     const result = await fetchFromApi(args.query)
     return { content: [{ type: 'text', text: JSON.stringify(result) }] }
   }
-  
+
   throw new Error(`Unknown tool: ${name}`)
 })
 

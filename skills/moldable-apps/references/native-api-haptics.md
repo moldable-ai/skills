@@ -19,9 +19,7 @@ Patterns are `generic`, `alignment`, and `level-change`.
 
 `apiAvailable` reports whether the host can submit a request. `hardwareStatus`
 and the result's `physicalFeedback` are `unknown` on macOS because AppKit does
-not confirm whether compatible hardware produced feedback. The legacy
-`available` and `performed` booleans mean API availability and request
-acceptance respectively; they do not confirm a physical effect.
+not confirm whether compatible hardware produced feedback.
 
 ## Rules
 

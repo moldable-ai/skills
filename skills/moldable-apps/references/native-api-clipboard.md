@@ -2,7 +2,7 @@
 
 The clipboard API intentionally handles text only.
 
-Declare `clipboard-read`, `clipboard-write`, or both in `nativeHardware`,
+Declare `clipboard-read`, `clipboard-write`, or both in `nativeCapabilities`,
 matching the operations the app actually exposes.
 
 ```typescript

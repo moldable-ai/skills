@@ -4,11 +4,11 @@ Use the media helpers from `@moldable-ai/ui` for camera, microphone, and display
 capture. They return standard `MediaStream` objects and preserve familiar web
 constraints.
 
-Declare each browser media source the app uses in `nativeHardware`: `camera`,
+Declare each browser media source the app uses in `nativeCapabilities`: `camera`,
 `microphone`, and/or `screen-capture`. The declaration delegates the browser
 capability but does not replace the browser/OS prompt or system-owned capture
 picker. The typed system-audio host API uses its own scoped App Access grant and
-does not add a `nativeHardware` value.
+also requires the `system-audio` `nativeCapabilities` value.
 
 ```typescript
 import {
@@ -28,7 +28,7 @@ import {
   stopMoldableMediaStream,
   stopMoldableSystemAudioCapture,
   subscribeMoldableSystemAudioEvents,
-  supportsNativeHardwareCapability,
+  supportsNativeCapability,
 } from '@moldable-ai/ui'
 ```
 
@@ -66,8 +66,8 @@ the standard media helpers and their webview permission behavior there.
 ```typescript
 const native = await getMoldableNativeCapabilities();
 if (
-  !supportsNativeHardwareCapability(native, "camera") &&
-  !supportsNativeHardwareCapability(native, "microphone")
+  !supportsNativeCapability(native, "camera") &&
+  !supportsNativeCapability(native, "microphone")
 )
   return;
 

@@ -1,6 +1,6 @@
 # Native USB
 
-Declare `"usb"` in `nativeHardware`, check capability support, then request a
+Declare `"usb"` in `nativeCapabilities`, check capability support, then request a
 device from a direct user action with restrictive filters.
 
 ```typescript

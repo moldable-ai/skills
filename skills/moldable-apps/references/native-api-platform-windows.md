@@ -23,7 +23,7 @@ sidecars, signing, updater output, and the release QA matrix are complete.
 
 ## App rules
 
-- Declare embedded device API use in `nativeHardware`; never assume a Chromium
+- Declare embedded device API use in `nativeCapabilities`; never assume a Chromium
   API is enabled merely because WebView2 can implement it.
 - Expect global or per-desktop-app privacy switches and managed-device policy.
 - Handle remote-session differences and device contention.

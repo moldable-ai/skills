@@ -1,6 +1,6 @@
 # Native Serial
 
-Declare `"serial"` in `nativeHardware`, filter where possible, and request a port
+Declare `"serial"` in `nativeCapabilities`, filter where possible, and request a port
 from a direct user action.
 
 ```typescript

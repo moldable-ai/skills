@@ -1,6 +1,6 @@
 # Native Bluetooth Low Energy
 
-Declare `"bluetooth"` in `nativeHardware` and use the fallback-aware request
+Declare `"bluetooth"` in `nativeCapabilities` and use the fallback-aware request
 helper with restrictive filters and an explicit service allowlist.
 
 ```typescript

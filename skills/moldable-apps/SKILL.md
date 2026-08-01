@@ -1,6 +1,6 @@
 ---
 name: moldable
-description: Complete guide for building Moldable apps. Use this skill when creating or modifying apps, creating or managing Scheduled automations, implementing workspace-aware storage, using typed native APIs for media, location, clipboard, notifications, displays, shortcuts, power/session state, local authentication, haptics, secure storage, USB, HID, serial, MIDI, or Bluetooth, declaring nativeHardware permissions, integrating with Moldable desktop messages, publishing artifacts, configuring workspaces, managing skills/MCPs, or troubleshooting app issues.
+description: Complete guide for building Moldable apps and semantic experiences. Use this skill when creating or modifying apps, composing iPhone nativeUI/A2UI projections, supporting voice or remote control, designing sync-safe storage, creating or managing Scheduled automations, using workspace-aware storage or typed native hardware APIs, integrating with Moldable desktop messages, publishing artifacts, configuring workspaces, managing skills/MCPs, or troubleshooting app issues.
 ---
 
 # Moldable App Development
@@ -17,6 +17,7 @@ This skill provides comprehensive knowledge for building and modifying apps with
 | MCP config       | `~/.moldable/shared/config/mcp.json`                        |
 | Skills           | `~/.moldable/shared/skills/{repo}/{skill}/`                 |
 | Environment      | `~/.moldable/shared/.env`                                   |
+| Native iOS UI    | `nativeUI` tool in a first-party iOS conversation           |
 
 ## Default Tech Stack
 
@@ -29,18 +30,30 @@ This skill provides comprehensive knowledge for building and modifying apps with
 
 ## UI Package Contract
 
-This skill targets **`@moldable-ai/ui` 0.2.22**. Pin that exact version in
-generated app manifests. Before UI work, confirm the installed package version;
-if it differs, use the public exports and guides shipped with that installed
-version rather than assuming this skill's target APIs still apply.
+Use the `@moldable-ai/ui` package and guides that ship beside this skill.
 
 The package owns component APIs. Treat its root `src/index.ts` and
 `src/components/ui/index.ts` barrels as the public surface, and read the
-version-matched colocated guide for every selected component family. This skill
+colocated guide for every selected component family. This skill
 routes component choice and composition; it does not replace those guides with
 copied prop tables. If the needed primitive is missing, **report the package
 gap**. Do not hand-roll a competing shared control or deep-import private
 source.
+
+## Product Surfaces
+
+- Build desktop app views for their own host-owned window by default. Keep the
+  same `AppFrame` hierarchy usable in the embedded compatibility/fallback
+  surface, but do not design a web page or simulate macOS window chrome.
+- Users can enable **Voice mode** in Settings on supported macOS builds. Voice
+  and chat must drive the same workspace-scoped app APIs and semantic actions;
+  do not create a voice-only app implementation.
+- Treat iPhone as a native semantic projection over the same authoritative app
+  state, not a second app implementation. Use `nativeUI` only when the current
+  conversation exposes it.
+- Keep durable app state inside the documented workspace paths so filesystem
+  sync can preserve it. Read [references/sync.md](references/sync.md) before
+  changing storage locations, app-release behavior, or sync-sensitive data.
 
 ## Creating Apps
 
@@ -72,6 +85,20 @@ The home screen is the host-rendered **Today** view. Apps participate by impleme
 ### Drive contract
 
 Every new app must be drivable by chat and voice from day one. Declare an `<appId>.drive` capability with fully prefixed `<appId>.ui.describe`, `<appId>.ui.navigate`, and `<appId>.ui.read` scopes; implement the workspace-scoped UI-intent flow; and listen for `moldable:app-api-changed` in the client. Add model-readable signature actions for the app's important verbs. Follow [references/app-to-app-communication.md](references/app-to-app-communication.md#drive-contract-voice--chat-steering) for the complete contract and Plants reference code.
+
+### Native iPhone projection
+
+When a chat or voice turn originates on iPhone and asks to show structured or
+interactive information, treat `nativeUI` as the default materialization
+surface. Read [references/native-ui.md](references/native-ui.md), then select a
+composition from [references/native-ui-patterns.md](references/native-ui-patterns.md)
+and confirm current component properties in
+[references/native-ui-catalog.md](references/native-ui-catalog.md). Keep app
+data authoritative behind the app RPC; native UI is a conversation-scoped
+semantic projection, not another app implementation.
+
+Do not apply the sibling `moldable-ui-patterns` skill to native SwiftUI
+composition. That skill is for React, web, and desktop app interfaces.
 
 ### Scheduled agent work
 
@@ -149,15 +176,20 @@ Read these for in-depth guidance:
 
 - [references/design.md](references/design.md) — Moldable product design guidance for app archetypes, state handling, density, copy, motion, and UI polish. Read this before visible UI work.
 - [references/today.md](references/today.md) — The **Today** home view: implementing `GET /api/moldable/today`, item kinds, actions, and the "quiet by default" rules.
-- [references/ui.md](references/ui.md) — **@moldable-ai/ui 0.2.22** source routing, app shell, component decisions, standalone windows, fallback-first host services, themes, and commands
+- [references/ui.md](references/ui.md) — Current `@moldable-ai/ui` source routing, macOS-native app shell, component decisions, standalone windows, fallback-first host services, themes, and commands
 - [../moldable-ui-patterns/SKILL.md](../moldable-ui-patterns/SKILL.md) — Focused component-selection and macOS-quality workflow. Read for visible UI creation, refactoring, or audits when this sibling skill is available.
+- [references/native-ui.md](references/native-ui.md) — iOS semantic-projection workflow, app ownership, verified assets, conversational actions, incremental updates, and delivery rules
+- [references/native-ui-catalog.md](references/native-ui-catalog.md) — Current Moldable native component families and compact property reference
+- [references/native-ui-patterns.md](references/native-ui-patterns.md) — Reusable iPhone compositions for collections, details, dashboards, galleries, maps, schedules, forms, media, and system states
+- [references/voice-and-remote-control.md](references/voice-and-remote-control.md) — Voice enablement, shared semantic actions, paired iPhone transport boundaries, replay, assets, and current limitations
+- [references/sync.md](references/sync.md) — Filesystem sync ownership, included and excluded state, offline/conflict behavior, app-release divergence, and iOS boundaries
 - [references/storage-patterns.md](references/storage-patterns.md) — Filesystem storage, React Query, workspace-aware APIs
 - [references/browser-storage-audit.md](references/browser-storage-audit.md) — Current browser storage usage and migration guidance
 - [references/desktop-apis.md](references/desktop-apis.md) — Router for desktop integration APIs
 - [references/desktop-message-apis.md](references/desktop-message-apis.md) — Window, chat, file, and artifact postMessage APIs
 - [references/native-apis.md](references/native-apis.md) — Typed native capability API overview and usage rules; route native-capability UI through [references/ui.md](references/ui.md)
 - [references/native-api-support.md](references/native-api-support.md) — Native capability support matrix and permission summary
-- [references/native-api-permissions.md](references/native-api-permissions.md) — `nativeHardware` declarations and per-app workspace grants
+- [references/native-api-permissions.md](references/native-api-permissions.md) — `nativeCapabilities` declarations and per-app workspace grants
 - [references/native-api-media.md](references/native-api-media.md) — Camera, microphone, display capture, macOS permission status/request/diagnostics, and system audio
 - [references/native-api-location.md](references/native-api-location.md) — Current-position API and permission behavior
 - [references/native-api-clipboard.md](references/native-api-clipboard.md) — Native clipboard text APIs
@@ -184,6 +216,12 @@ Read these for in-depth guidance:
 
 For any visible app UI, read [references/design.md](references/design.md) before editing `src/client/app.tsx` or client components. Also use the focused [moldable-ui-patterns skill](../moldable-ui-patterns/SKILL.md) when available; it routes component choice, app-shell composition, keyboard/accessibility checks, and per-component guidance.
 
+For a native iPhone surface, do not use the web UI workflow below. Read the
+three native UI references above and use the conversation-scoped `nativeUI`
+tool. The host owns SwiftUI styling, navigation chrome, presentation, Relay,
+and rendering; the agent supplies semantic hierarchy, bounded data bindings,
+verified asset aliases, and actions.
+
 ### Required Design-System Workflow
 
 1. **Identify the shell archetype.** Name the app's primary object and choose
@@ -193,7 +231,7 @@ For any visible app UI, read [references/design.md](references/design.md) before
    [references/ui.md](references/ui.md); start with `AppFrame` and compose
    shared pane, toolbar, inspector, feedback, and control families.
 3. **Read the selected guides.** Confirm every named export in the public
-   barrels, then read each selected component family's version-matched
+   barrels, then read each selected component family's colocated
    colocated guide. The guide owns props, states, keyboard behavior, and
    composition details.
 4. **Inventory states before implementation.** Cover every applicable loading,

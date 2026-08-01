@@ -408,16 +408,13 @@ Add a `drive.test.ts` (or an equivalent focused suite) covering the manifest/RPC
 
 ## Calling Another App
 
-`@moldable-ai/ui` 0.2.22 does **not** publicly export a caller-side app-to-app
-helper. An earlier revision of this guide showed `callMoldableApp`, but that
-symbol is not in the package root barrel even though an internal implementation
-exists in `src/lib/commands.ts`.
+`@moldable-ai/ui` does **not** publicly export a caller-side app-to-app helper.
 
 Do not import it, deep-import the implementation, or recreate its broker
 messages in app code. Report this public-package gap and wait for a verified
-root export before generating a caller. Once a public helper ships, confirm it
-in the installed package barrel and follow its version-matched guide. Access
-grants remain workspace-specific and revocable in Settings -> App Access.
+root export before generating a caller. Confirm any new helper in the package
+barrel and follow its colocated guide. Access grants remain workspace-specific
+and revocable in Settings -> App Access.
 
 ## Target RPC Endpoint
 

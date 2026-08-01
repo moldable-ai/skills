@@ -1,6 +1,6 @@
 # Native HID
 
-Declare `"hid"` in `nativeHardware` and request only the device usages needed by
+Declare `"hid"` in `nativeCapabilities` and request only the device usages needed by
 the feature.
 
 ```typescript

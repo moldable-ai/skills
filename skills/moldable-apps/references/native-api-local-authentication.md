@@ -26,7 +26,7 @@ failures reject separately.
 
 Authentication policy is explicit:
 
-- `device-owner` is the backward-compatible default and allows any
+- `device-owner` is the default and allows any
   operating-system-approved device-owner method. A successful result reports
   method `device-owner` because macOS does not disclose whether biometrics or a
   device credential completed that policy.

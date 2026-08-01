@@ -3,20 +3,32 @@
 Native access has three independent layers: runtime capability discovery,
 manifest delegation for embedded web APIs, and user/OS approval.
 
-## Declare embedded web capabilities
+## Declare native capabilities
 
-Add only the browser-delegated capabilities an app uses to `moldable.json`:
+Add every native capability an app invokes to `moldable.json` under
+`nativeCapabilities`:
 
 ```json
 {
   "name": "Field Console",
-  "nativeHardware": [
+  "nativeCapabilities": [
     "camera",
     "microphone",
     "screen-capture",
+    "system-audio",
     "location",
     "clipboard-read",
     "clipboard-write",
+    "notifications",
+    "displays",
+    "global-shortcuts",
+    "power-monitor",
+    "idle-state",
+    "session-events",
+    "sleep-blocker",
+    "local-authentication",
+    "haptics",
+    "secure-storage",
     "usb",
     "hid",
     "serial",
@@ -26,31 +38,32 @@ Add only the browser-delegated capabilities an app uses to `moldable.json`:
 }
 ```
 
-The allowlist is exactly the values above. `screen-capture` delegates the
-browser's `display-capture` policy and `location` delegates `geolocation`.
-Declarations are deduplicated, unknown values are ignored, and omission means
-no sensitive browser capability is delegated. Restart or reload the app after
-changing the manifest so its iframe is created with the new Permissions Policy.
+The values above are the native hardware capability IDs documented here.
+`screen-capture` delegates the browser's `display-capture` policy and `location`
+delegates `geolocation`. Declarations are deduplicated, unknown values are
+ignored, and omission prevents the host request and sensitive browser delegation
+for that capability. Restart or reload the app after changing the manifest so
+its iframe is created with the new Permissions Policy.
 
-A declaration is not permission. It only allows the embedded app to attempt the
-corresponding web API. Browser-owned media streams and permission prompts stay
-in the webview; an OS chooser and Moldable's native-fallback grant can still be
-required.
+A declaration is not permission. The host delegates the matching iframe
+Permissions Policy token only when the app also has the corresponding active
+App Access grant. Browser-owned media streams and permission prompts stay in
+the webview; an OS chooser can still be required.
 
 ## Per-app grants
 
 Privileged host requests are approved per caller app, workspace, and capability.
-Grant scopes use `native-hardware.<capability>`, for example:
+Grant scopes use `native-capabilities.<capability>`, for example:
 
-- `native-hardware.global-shortcuts`
-- `native-hardware.sleep-blocker`
-- `native-hardware.local-authentication`
-- `native-hardware.camera`
-- `native-hardware.microphone`
-- `native-hardware.screen-capture`
-- `native-hardware.system-audio`
-- `native-hardware.secure-storage`
-- `native-hardware.usb`
+- `native-capabilities.global-shortcuts`
+- `native-capabilities.sleep-blocker`
+- `native-capabilities.local-authentication`
+- `native-capabilities.camera`
+- `native-capabilities.microphone`
+- `native-capabilities.screen-capture`
+- `native-capabilities.system-audio`
+- `native-capabilities.secure-storage`
+- `native-capabilities.usb`
 
 Moldable derives caller identity from the hosting app view. Never add an app ID,
 workspace ID, raw Tauri invocation, or copied host protocol to app code. Denied
@@ -63,15 +76,17 @@ still governed by the webview/OS media policy and system source picker.
 
 Location follows the same separation: reading authorization status is
 non-prompting and does not create a grant, while requesting a current position
-requires the scoped location grant, a visible view, and fresh user activation.
+requires the scoped location grant and a visible view. A first-time grant
+requires a direct user action; keep location requests user-triggered so any
+operating-system approval UI has the expected context.
 
 System-audio capability checks and stop requests are non-escalating. Permission,
 start, status, and replay requests require the app's scoped `system-audio` grant;
 permission and start also require a visible view and a direct user action.
-The typed system-audio host API is not a browser delegation and `system-audio`
-is not a `nativeHardware` manifest value. `captureMode: 'systemMicrophone'` does
-not require a `microphone` declaration unless the app also uses the browser
-microphone APIs.
+The typed system-audio host API is not a browser delegation, but it still
+requires the `system-audio` `nativeCapabilities` declaration. `captureMode:
+'systemMicrophone'` does not require the separate `microphone` declaration
+unless the app also uses the browser microphone APIs.
 
 Treat a first-time OS permission prompt and capture start as two user actions:
 request permission from an Enable action, then render a Start action. If

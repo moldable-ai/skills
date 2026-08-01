@@ -10,10 +10,11 @@ Build interfaces that feel like focused desktop tools: quiet, compact, responsiv
 ## Workflow
 
 1. Identify the product task, primary object, and dominant interaction before choosing components.
-2. Read [references/design-language.md](references/design-language.md),
-   [references/tokens-and-materials.md](references/tokens-and-materials.md), and
+2. Read [references/design-language.md](references/design-language.md) and
    [references/component-index.md](references/component-index.md) for all
-   visible UI work.
+   visible UI work. Read
+   [references/tokens-and-materials.md](references/tokens-and-materials.md)
+   when choosing a surface, density, material, or token.
 3. Read only the additional references needed:
    - Standalone windows, shells, panes, inspectors, scrolling, or chat overlap:
      [references/app-shell-and-layout.md](references/app-shell-and-layout.md)
@@ -25,7 +26,14 @@ Build interfaces that feel like focused desktop tools: quiet, compact, responsiv
    - Component adoption, catalog work, or migration:
      [references/catalog-and-migration.md](references/catalog-and-migration.md)
    - Planning a new screen or delegating implementation: [references/frontend-architect-prompt.md](references/frontend-architect-prompt.md)
-4. Inspect the installed `@moldable-ai/ui` exports or the monorepo source before using an uncertain API. Import from the package root; do not depend on internal source paths.
+4. Select the semantic component family, then read its colocated guide before
+   coding. In an installed package use
+   `node_modules/@moldable-ai/ui/src/components/ui/<component>.md`; in the
+   desktop monorepo use
+   `packages/ui/src/components/ui/<component>.md`. For host services, read the
+   matching `src/lib/<service>.md`. Inspect the package-root export before using
+   an uncertain API. Import only from `@moldable-ai/ui`; documentation paths
+   are for reading, never import paths.
 5. Choose one screen archetype, assign one owner for each scroll region, and specify loading, empty, error, ready, and disabled states before implementation.
 6. Implement with semantic tokens and shared components. Keep feature-specific
    composition in the app instead of adding one-off variants to the kit.
@@ -45,9 +53,9 @@ Build interfaces that feel like focused desktop tools: quiet, compact, responsiv
   simulated system chrome.
 - Use semantic colors, type roles, density, surfaces, control states, motion,
   and material tokens. Never hard-code palette colors for application chrome.
-- Prefer `Text`, `Panel`, `Toolbar`, `SplitView`, `Inspector`, `Status`,
-  `NumberInput`, `ColorWell`, `EdgeFade`, `Material`, and `AppFrame` when their
-  semantics match.
+- Prefer the shared semantic primitive over an app-local recreation. Use the
+  decision router, then the selected component's colocated guide, rather than
+  memorizing or copying a prop catalog into app code.
 - Use `Material` only for navigation and control chrome. Prefer `regular`;
   reserve `clear` for compact controls over media, and use one
   `MaterialGroup` sampler for a related control cluster. Keep content surfaces
@@ -69,14 +77,16 @@ Build interfaces that feel like focused desktop tools: quiet, compact, responsiv
   safe-area tokens. Never add an app-local `window.message` listener for chat
   overlap.
 - Keep native capability behavior behind typed host contracts with a portable
-  fallback. A UI component must not call one platform's bridge directly.
+  fallback. A UI component must not call one platform's bridge directly. Read
+  the colocated host-service guide before using native menus, file/date pickers,
+  sharing, or a host web surface.
 - Treat CSS material as an in-renderer effect. Behind-window material,
   transparency, active-window treatment, and energy policy remain host-owned.
 - Earn a native feel through hierarchy, density, typography, keyboard behavior,
   window-aware layout, and restrained motion.
 
-When package component guides are present, read each selected family at
-`node_modules/@moldable-ai/ui/src/components/ui/<component>.md` or, in the
-desktop monorepo, `packages/ui/src/components/ui/<component>.md`.
+Do not clone package component guides into this skill. The UI package publishes
+the guides beside the components specifically so their APIs, accessibility
+contracts, and examples stay current with the package.
 
 Use the broader `moldable` skill for app scaffolding, data, workspace, native-capability permissions, and lifecycle rules.

@@ -6,7 +6,7 @@ Do not exclusively depend on example apps being installed. This file embeds the 
 
 For component selection, authored app-shell primitives, and implementation
 checks, also read the sibling
-[`moldable-ui-patterns` skill](../moldable-ui-patterns/SKILL.md) when available.
+[`moldable-ui-patterns` skill](../../moldable-ui-patterns/SKILL.md) when available.
 Use the component guides shipped with `@moldable-ai/ui`; this file owns product
 composition rather than duplicating every component API.
 

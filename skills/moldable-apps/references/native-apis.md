@@ -3,10 +3,11 @@
 Moldable apps access protected desktop capabilities through typed helpers from
 `@moldable-ai/ui`. Never call host message protocols or Tauri commands directly.
 
-**Building UI on these APIs?** Reach for the prebuilt hardware components first
-(`CameraPreview`, `SerialConsole`, `LocationPanel`, `CapabilityMatrix`, …) —
-see [ui.md](ui.md) § Hardware Components. The imperative helpers below are the
-right layer for headless logic and custom visuals.
+**Building UI on these APIs?** Reach for the prebuilt native-capability
+components first (`CameraPreview`, `SerialConsole`, `LocationPanel`,
+`CapabilityMatrix`, …) — see [ui.md](ui.md) § Native Capability Components.
+The imperative helpers below are the right layer for headless logic and custom
+visuals.
 
 ## Choose a reference
 
@@ -34,9 +35,10 @@ right layer for headless logic and custom visuals.
 ## Required workflow
 
 1. Call `getMoldableNativeCapabilities()` and inspect the exact capability.
-2. Add every browser-delegated capability used by the app to `nativeHardware`
-   before the iframe loads: camera, microphone, screen capture, location,
-   clipboard read/write, USB, HID, serial, MIDI, or Bluetooth.
+2. Add every native capability the app invokes to `nativeCapabilities` before
+   the iframe loads. This includes browser-delegated camera, microphone, screen
+   capture, location, clipboard, USB, HID, serial, MIDI, and Bluetooth APIs as
+   well as typed host APIs such as notifications, displays, and secure storage.
 3. Explain the user-visible purpose and request access from a direct user action.
 4. Treat `partial`, denied, cancelled, busy, disconnected, and unavailable as
    normal product states.
@@ -46,26 +48,26 @@ right layer for headless logic and custom visuals.
 ```typescript
 import {
   getMoldableNativeCapabilities,
-  getNativeHardwareCapability,
-  supportsNativeHardwareCapability,
+  getNativeCapability,
+  supportsNativeCapability,
 } from '@moldable-ai/ui'
 
 const native = await getMoldableNativeCapabilities()
-const camera = getNativeHardwareCapability(native, 'camera')
+const camera = getNativeCapability(native, 'camera')
 
 if (camera.support === 'unsupported') {
   // Hide the action or render an unavailable explanation.
 } else if (camera.support === 'partial') {
   // Keep a fallback visible and use camera.reason in diagnostics.
-} else if (supportsNativeHardwareCapability(native, 'camera')) {
+} else if (supportsNativeCapability(native, 'camera')) {
   // The runtime path exists; permission and hardware can still reject a request.
 }
 ```
 
-The current `NativeHardwareCapabilityManifest` has `schemaVersion: 2`, a
-`platform`, and one descriptor for every `NATIVE_HARDWARE_CAPABILITY_IDS` entry.
+`NativeCapabilityManifest` has a `platform` and one descriptor for every
+`NATIVE_CAPABILITY_IDS` entry.
 Each descriptor contains `support`, `transport`, `permission`, and an optional
-`reason`. `supportsNativeHardwareCapability()` is only shorthand for “not
+`reason`. `supportsNativeCapability()` is only shorthand for “not
 unsupported”; it intentionally returns `true` for `partial`.
 
 The runtime result is authoritative. Do not infer support from a user agent,
@@ -73,10 +75,10 @@ The runtime result is authoritative. Do not infer support from a user agent,
 
 ## Bridge errors
 
-Desktop-bridge failures reject with `NativeHardwareBridgeError`. Its public
-fields are `code: NativeHardwareErrorCode`, `message`, optional `details`, and
-optional `retryable`. Use `toNativeHardwareBridgeError()` at a bridge-backed API
-boundary when the caught value is unknown.
+Desktop-bridge failures reject with `NativeCapabilityBridgeError`. Its public
+fields are `code: NativeCapabilityErrorCode`, `message`, optional `details`,
+and optional `retryable`. Use `toNativeCapabilityBridgeError()` at a
+bridge-backed API boundary when the caught value is unknown.
 
 Error codes are grouped by response:
 
@@ -96,7 +98,7 @@ still intends the operation and `retryable === true`; never display or persist
 
 - The desktop derives app and workspace identity; app payloads cannot choose it.
 - Privileged bridge operations use workspace-scoped
-  `native-hardware.<capability>` grants.
+  `native-capabilities.<capability>` grants.
 - Device fallbacks expose bounded descriptors and opaque handles, not arbitrary
   device paths.
 - Embedded-web device declarations delegate only the matching iframe Permissions

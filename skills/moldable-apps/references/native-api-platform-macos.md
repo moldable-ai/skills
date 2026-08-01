@@ -39,7 +39,8 @@ and complete packaged-app hardware QA for the exact release build.
 
 ## App rules
 
-- Declare embedded USB/HID/serial/MIDI/Bluetooth access in `nativeHardware`.
+- Declare each required native capability in `nativeCapabilities`, including
+  embedded USB/HID/serial/MIDI/Bluetooth access.
 - Do not treat display names, device IDs, serial numbers, MIDI port names, or BLE
   names as durable identity.
 - Release blockers, shortcut registrations, event subscriptions, ports, devices,

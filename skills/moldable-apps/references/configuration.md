@@ -17,11 +17,8 @@ Every app has a `moldable.json` in its root directory:
   "icon": "🚀",
   "category": "custom",
   "tags": [],
-  "moldableDependencies": {
-    "@moldable-ai/ui": "^0.1.0"
-  },
   "env": [],
-  "nativeHardware": []
+  "nativeCapabilities": []
 }
 ```
 
@@ -38,11 +35,35 @@ Every app has a `moldable.json` in its root directory:
 | `tags`                 | No       | Array of searchable tags                                                                                                                   |
 | `moldableDependencies` | No       | Required Moldable packages                                                                                                                 |
 | `env`                  | No       | Required environment variables                                                                                                             |
-| `nativeHardware`       | No       | Browser capabilities to delegate: camera, microphone, screen capture, location, clipboard read/write, USB, HID, serial, MIDI, or Bluetooth |
+| `nativeCapabilities`   | No       | Native capabilities used by the app; declare only IDs supported by the active runtime                                                   |
+| `window`               | No       | Dedicated-window options; host titlebar is the default, while `{ "titlebar": "app" }` opts into an app-owned titlebar row                   |
 
-`nativeHardware` is deny-by-default for sensitive embedded web capabilities.
-It does not bypass a Moldable grant, browser/OS permission, or device chooser.
+Preserve the dependency entries created by `scaffoldApp`; this skill ships
+beside the package code and does not pin package releases independently.
+
+`nativeCapabilities` is deny-by-default. It does not bypass a Moldable grant,
+browser/OS permission, or device chooser.
 See [Native hardware permissions](native-api-permissions.md).
+
+### Dedicated window titlebar
+
+Keep the host titlebar for most apps. Use app-titlebar mode only when the app
+needs one unified identity-and-toolbar row:
+
+```json
+{
+  "window": {
+    "titlebar": "app"
+  }
+}
+```
+
+App-titlebar mode still leaves the real window controls with the host. Begin
+the view with `AppFrame` and render that row with `AppFrameTitlebar`; it
+consumes the host's titlebar height and leading control inset, preserving the
+traffic-light safe zone and forwarding drag behavior from non-interactive
+space. Do not place controls in the safe zone or recreate window controls.
+See [UI components](ui.md) for the standalone-window decision.
 
 ### Surfacing to the home screen
 

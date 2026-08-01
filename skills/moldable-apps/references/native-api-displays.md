@@ -7,11 +7,11 @@ query API, not a display-change subscription.
 import {
   getMoldableDisplays,
   getMoldableNativeCapabilities,
-  supportsNativeHardwareCapability,
+  supportsNativeCapability,
 } from "@moldable-ai/ui";
 
 const native = await getMoldableNativeCapabilities();
-if (!supportsNativeHardwareCapability(native, "displays")) return;
+if (!supportsNativeCapability(native, "displays")) return;
 
 const { displays } = await getMoldableDisplays();
 const primary = displays.find((display) => display.primary);

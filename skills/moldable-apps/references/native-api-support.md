@@ -58,7 +58,7 @@ macOS does not provide a stable, supported signal for it.
 | Clipboard                                                                              | focus/user gesture may apply                                                                         | Never poll; make Copy/Paste explicit.                                        |
 | Notifications                                                                          | OS permission and app grant for request/send                                                         | Request in context; avoid sensitive lock-screen text.                        |
 | Displays, shortcuts, power/idle/session, blockers, local auth, haptics, secure storage | Per-app workspace grant for privileged operations; read-only availability/diagnostics may be ungated | Explain the purpose; handle revocation/denial; release resources.            |
-| USB, HID, serial, MIDI, Bluetooth                                                      | `nativeHardware` declaration, per-app grant for native fallback, chooser/OS permission               | Use restrictive filters; show a selector when required; close every handle.  |
+| USB, HID, serial, MIDI, Bluetooth                                                      | `nativeCapabilities` declaration, per-app grant for native fallback, chooser/OS permission            | Use restrictive filters; show a selector when required; close every handle.  |
 
 See [Permission grants and manifests](native-api-permissions.md) for the exact
 manifest format and grant boundary.

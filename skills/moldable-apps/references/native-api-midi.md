@@ -1,6 +1,6 @@
 # Native MIDI
 
-Declare `"midi"` in `nativeHardware`. Use the fallback-aware entry point unless
+Declare `"midi"` in `nativeCapabilities`. Use the fallback-aware entry point unless
 the feature specifically requires the standard Web MIDI object model.
 
 ```typescript

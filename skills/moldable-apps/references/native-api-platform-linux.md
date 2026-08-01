@@ -19,7 +19,7 @@ compositor, X11/Wayland session, portal, WebKitGTK build, and system services.
 
 ## Validation rules
 
-- Declare embedded device access in `nativeHardware` and use restrictive filters.
+- Declare embedded device access in `nativeCapabilities` and use restrictive filters.
 - Validate supported targets in representative X11 and Wayland sessions.
 - Record distribution, desktop, compositor, webview, portal/service versions,
   installer type, and physical hardware.
