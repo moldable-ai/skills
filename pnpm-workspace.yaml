@@ -1,0 +1,26 @@
+packages:
+  - '.'
+
+# Moldable package supply-chain policy
+minimumReleaseAge: 10080
+minimumReleaseAgeExclude:
+  - '@moldable-ai/*'
+minimumReleaseAgeIgnoreMissingTime: false
+minimumReleaseAgeStrict: true
+trustPolicy: no-downgrade
+trustPolicyIgnoreAfter: 10080
+trustLockfile: false
+blockExoticSubdeps: true
+strictDepBuilds: true
+allowBuilds:
+  'esbuild@0.25.0': true
+  'esbuild@0.25.12': true
+  'esbuild@0.27.2': true
+  'esbuild@0.27.3': true
+  'esbuild@0.27.7': true
+  'esbuild@0.28.0': true
+  'esbuild@0.28.1': true
+  'sharp@0.34.5': true
+  'unrs-resolver@1.11.1': true
+  'workerd@1.20260616.1': true
+  'workerd@1.20260701.1': true
