@@ -20,7 +20,8 @@ The best Moldable app usually has:
 - a quiet [Today contribution](today.md) that surfaces on the home screen only when something genuinely needs the user
 - compact chrome that stays close to the object being manipulated
 - real loading, empty, error, auth, permission, and background-activity states
-- clear AI context for the desktop chat when the app has useful state
+- clear, bounded context for the app's assigned bot/group channel when the app
+  has useful state
 - enough structure to be predictable, but not so much decoration that the app feels generated
 
 ## Required Design Pass
@@ -32,7 +33,8 @@ Before editing UI files, write these answers in your working notes:
 3. **Today trigger:** When (if ever) does this app genuinely need the user on the home screen? See [today.md](today.md). Default to silence.
 4. **Full-view shape:** Choose one layout archetype from this file.
 5. **State inventory:** Name the empty, loading, error, auth, permission, and busy states.
-6. **Chat clearance:** Which scroll areas and fixed controls must respect `--chat-safe-padding`?
+6. **Bottom layout:** Which fixed controls need normal window or mobile-safe-area
+   clearance? Do not reserve desktop space for the host channel panel.
 7. **Commands:** Which actions should be available through app commands or Cmd+K?
 
 If an answer is vague, simplify the app before designing. "Manage items" is too vague. "Review today's unread customer emails" is usable.
@@ -49,12 +51,14 @@ If an answer is vague, simplify the app before designing. "Manage items" is too 
 - Do not create a marketing landing page as the first screen.
 - Do not use visible instructional copy to explain obvious UI features.
 - Do not put the app name in the main app content. Moldable already shows the active app name in desktop chrome.
-- Do not add a separate chat input, chat panel, prompt box, or assistant conversation inside an app. Moldable already has desktop chat.
+- Do not add a separate chat input, chat panel, prompt box, or assistant conversation inside an app. Moldable already provides the host-owned bot/group channel surface.
 - Do not wrap the whole app in cards. Use full-height surfaces, panes, lists, editors, and toolbars.
 - Do not nest cards.
 - Do not use decorative gradients, gradient text, translucent content cards, bokeh/orb backgrounds, oversized hero type, or repeated icon-card grids. Adaptive material is for navigation and control chrome, not content.
 - Keep text within its container at all sizes. Use `min-w-0`, `truncate`, `line-clamp-*`, flexible grids, and stable dimensions.
-- Respect `--chat-safe-padding` anywhere content or controls can be hidden by the desktop chat.
+- Do not reserve desktop space for the host channel panel: desktop currently
+  sets `--chat-safe-padding` to `0px`. Preserve the token only in shared,
+  mobile-safe layout primitives, where it can represent mobile bottom clearance.
 - App shells must be full height. Put scrolling on intentional inner regions, not on `body` or an accidental page wrapper.
 - Dialogs, alert dialogs, and sheets with substantial content use their shared `*Body` scrolling regions so headers and actions remain visible within host safe areas.
 - Never use native browser confirmations: no `confirm()`, `window.confirm()`, or host/global `.confirm(...)`. Use `ConfirmDialog` for promise-backed consequential actions or `AlertDialog` for a custom static confirmation.
@@ -118,15 +122,15 @@ Rules:
 - do not render a large app-name header just to identify the app; Moldable desktop chrome already identifies the active app
 - top bars should name the current scope, selected object, mode, or action, not restate the app name
 - use `min-h-0 flex-1 overflow-y-auto` or `overflow-auto` only on scroll regions
-- let `AppFrameContent` consume chat-safe padding; for a custom owner, apply it
-  once to the bottom-most scrolling region
-- add extra safe padding when a fixed dock is present
+- use `AppFrameContent` for host window insets; do not add custom desktop
+  channel clearance
+- give a fixed dock only the ordinary spacing it needs
 - do not rely on the document/body scroll for the main app
 - use `Material`/`MaterialGroup` only for titlebars, toolbars, menus, popovers,
   and compact controls; keep the working canvas, forms, tables, and calendars
   opaque
-- empty states inside a scrollable or full-height pane still need bottom chat padding if they can be covered
-- tables, object browsers, inspectors, and result panes need their own safe bottom padding because they often scroll independently
+- empty states, tables, object browsers, inspectors, and result panes keep
+  ordinary bottom spacing appropriate to their own layout
 
 ### 1. List To Detail
 
@@ -216,7 +220,7 @@ Best when there is one active process or selected object and actions need to sta
 Structure:
 
 - fixed bottom centered dock
-- `bottom: calc(var(--chat-safe-padding, 0px) + 1.5rem)`
+- `bottom: 1.5rem`
 - `pointer-events-none` wrapper and `pointer-events-auto` dock
 - rounded full dock with semantic border/background
 - primary action is visually strongest
@@ -228,7 +232,7 @@ Pattern:
 ```tsx
 <div
   className="pointer-events-none fixed inset-x-0 z-50 flex justify-center px-4"
-  style={{ bottom: "calc(var(--chat-safe-padding, 0px) + 1.5rem)" }}
+  style={{ bottom: "1.5rem" }}
 >
   <div className="bg-background/95 shadow-foreground/10 pointer-events-auto flex h-14 max-w-[calc(100vw-2rem)] items-center gap-1 rounded-full border px-2 shadow-xl backdrop-blur-xl">
     <Button
@@ -273,7 +277,7 @@ Good grouped lists use:
 
 - `ScrollArea className="h-full px-5 pt-3"`
 - inner `mx-auto w-full max-w-[44rem] space-y-8`
-- bottom padding `pb-[calc(var(--chat-safe-padding,0px)+6rem)]` or more if a dock exists
+- bottom padding `pb-24` or more if a dock exists
 - section labels in muted small type
 - a single rounded group container with internal separators
 
@@ -562,31 +566,36 @@ Recoverable errors should include:
 - retry action if retry is possible
 - no stack traces in the UI
 
-## Chat And Desktop Integration
+## Channels And Desktop Integration
 
-Moldable's chat can overlay the app. Design for it.
+Moldable's host channel panel can overlay the app, but it does not reserve app
+layout space: desktop currently sets `--chat-safe-padding` to `0px` in every
+channel presentation.
 
-Do not build a second chat experience inside an app. No bottom prompt container, assistant conversation panel, "Ask AI" chat box, or app-local message thread. Moldable already provides desktop chat that can see app context, invoke app APIs, and interact with apps through commands and RPC. An in-app chat duplicates the host UI, wastes vertical space, and often collides with `--chat-safe-padding`.
+Do not build a second chat experience inside an app. No bottom prompt container, assistant conversation panel, "Ask AI" chat box, or app-local message thread. Moldable already provides a host-owned bot/group channel that can see app context, invoke app APIs, and interact with apps through commands and RPC. An in-app chat duplicates the host UI and wastes vertical space.
+
+The host selects a normal bot or group channel for each app: an explicit,
+workspace-scoped app assignment wins; otherwise the app follows the latest
+visible workspace channel. An app must not invent its own assistant identity or
+persist its own channel selection. User-requested assignment changes use the
+host's `assignAppChatChannel` tool, not an app `postMessage`.
 
 Use these alternatives instead:
 
 - expose app actions through `GET /api/moldable/commands` and handle them with `useMoldableCommands`
 - post useful state with `moldable:set-chat-instructions`
-- prefill the desktop chat only for explicit "ask Moldable about this" affordances via `moldable:set-chat-input`
+- prefill the app's assigned channel only for explicit "ask Moldable about this" affordances via `moldable:set-chat-input`
 - expose structured app-to-app APIs through `/api/moldable/rpc` and `moldable.json` `appApi.capabilities`
 - use normal app controls for direct actions: buttons, menus, docks, editors, inspectors, and forms
 
-Read [app-to-app-communication.md](app-to-app-communication.md) for app RPC and capability manifests, and [desktop-apis.md](desktop-apis.md) for desktop chat APIs.
+Read [app-to-app-communication.md](app-to-app-communication.md) for app RPC and capability manifests, and [desktop-apis.md](desktop-apis.md) for channel-context desktop APIs.
 
-Use safe padding:
+Do not add desktop channel clearance. Use ordinary layout spacing, for example
+`pb-24` for a long scrollable view or `bottom: 1.5rem` for a fixed dock. Shared
+app-shell primitives may retain `--chat-safe-padding` as a mobile-web-safe
+variable; do not add it manually to multiple ancestors.
 
-- scrollable full-view content: `pb-[calc(var(--chat-safe-padding,0px)+6rem)]`
-- long document/editor content: `pb-[calc(var(--chat-safe-padding,0px)+8rem)]`
-- bottom docks: `bottom: calc(var(--chat-safe-padding, 0px) + 1.5rem)`
-- tables or inspectors: `pb-[var(--chat-safe-padding,0px)]`
-- object browsers and side panes: `pb-[calc(var(--chat-safe-padding,0px)+1rem)]`
-
-Shared dialogs already account for host and chat safe areas. Put long content
+Shared dialogs already account for host window insets. Put long content
 inside the component's body region and keep the header and footer outside it:
 
 ```tsx
@@ -610,7 +619,7 @@ Dialog rules:
 - use `DialogBody`, `AlertDialogBody`, or `SheetBody` as the sole scrolling
   region
 - keep headers and footers outside the body
-- keep destructive confirmations compact, but still verify they do not sit under the chat overlay
+- keep destructive confirmations compact and within the host window insets
 - promise-backed destructive confirmations use `ConfirmDialog`; custom static
   confirmations use `AlertDialog`, never a native blocking confirmation
 - when a destructive action starts from a context menu or dropdown, let the menu selection finish, store the pending target in state, then open the `AlertDialog` with the exact object name or selected count before executing
@@ -767,7 +776,7 @@ Examples:
 
 AI features should feel like local assistance inside the workflow.
 
-AI features do not require an in-app chat container. Moldable's desktop chat is the conversational surface. Inside the app, expose AI as direct workflow controls and stateful results.
+AI features do not require an in-app chat container. Moldable's host bot/group channel is the conversational surface. Inside the app, expose AI as direct workflow controls and stateful results.
 
 Good patterns:
 
@@ -868,10 +877,10 @@ Before finishing UI work, verify:
 - full view does not add an app-name header just to identify the app
 - app shell is full height with `h-full min-h-0 overflow-hidden`
 - scrolling is on intentional inner panes, not the body
-- all scrollable content clears chat safe padding
-- dialogs with substantial content are height-constrained above the chat area and scroll internally
+- scrollable content has only the ordinary bottom spacing its layout requires
+- dialogs with substantial content are height-constrained within host window insets and scroll internally
 - confirmations use `AlertDialog`, never native `confirm()`, `window.confirm()`, or `.confirm(...)`
-- fixed docks clear chat safe padding
+- fixed docks use ordinary bottom spacing
 - no raw Tailwind colors
 - no marketing hero, feature-grid, decorative gradient, nested cards, or giant empty centered page
 - all icon-only actions have labels/tooltips
@@ -879,6 +888,6 @@ Before finishing UI work, verify:
 - text truncates or wraps cleanly
 - empty/error/setup copy is short and specific
 - commands exist for important actions
-- app does not include its own chat input/container; it uses desktop chat APIs, commands, or app RPC instead
+- app does not include its own chat input/container; it uses host channel-context APIs, commands, or app RPC instead
 - AI/app context is posted when useful
 - design works from this reference alone, and uses Mail, Meetings, or DB Browser as additional references when they are installed

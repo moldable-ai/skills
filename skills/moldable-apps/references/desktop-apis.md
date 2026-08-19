@@ -10,7 +10,7 @@ to do so.
 | ----------------------------------------------------------------------------------- | ------------------------------------------------------- |
 | Camera, microphone, screen capture, location, clipboard, notifications, or displays | [Native APIs](native-apis.md)                           |
 | Check native support by operating system                                            | [Native API support](native-api-support.md)             |
-| Open URLs, reveal files, control chat context, save files, or publish artifacts     | [Desktop message APIs](desktop-message-apis.md)         |
+| Open URLs, reveal files, control app-channel context, save files, or publish artifacts | [Desktop message APIs](desktop-message-apis.md)         |
 | Call another Moldable app                                                           | [App-to-app communication](app-to-app-communication.md) |
 | Publish a public unlisted static output                                             | [Artifact publishing](artifact-publishing.md)           |
 

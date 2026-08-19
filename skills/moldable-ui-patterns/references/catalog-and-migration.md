@@ -60,7 +60,7 @@ actions, row actions, primary form actions, destructive actions, then bespoke
 canvas controls. Verify accessible names, submit behavior, disabled state, and
 focus after each batch.
 
-For repeated chat-safe-area listeners, first add coverage around the shared
+For repeated channel-layout listeners, first add coverage around the shared
 frame lifecycle. Migrate one representative app, verify embedded and standalone
 presentation, then remove each app-local listener as callers adopt the shared
 contract. Do not mass-delete listeners before confirming equivalent event

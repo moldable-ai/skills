@@ -71,7 +71,9 @@ createRoot(document.getElementById("root")!).render(
 ```
 
 Install the frame lifecycle exactly once. It applies the host display mode,
-window insets, advertised host services, and chat-safe padding tokens.
+window insets, and advertised host services. Desktop currently publishes
+`--chat-safe-padding: 0px`; the token remains meaningful on mobile web, where
+it aliases the mobile bottom clearance.
 
 ## App Shell and Dedicated Windows
 

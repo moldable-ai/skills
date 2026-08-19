@@ -30,11 +30,11 @@ component-specific accessibility. Do not duplicate those catalogs here.
 
 ## App-safe versus host-oriented exports
 
-Most root-exported controls are app-safe. Host chat surfaces, model selectors,
-approval views, and conversation history are host-oriented: do not use them as
+Most root-exported controls are app-safe. Host bot/group channel surfaces, model
+selectors, approval views, and conversation history are host-oriented: do not use them as
 generic app primitives merely because they are exported. Ordinary apps use
 standard layout, form, collection, and feedback primitives unless a task
-explicitly requires host-compatible chat behavior.
+explicitly requires host-compatible channel behavior.
 
 Native-capability panels and hooks are app-safe only when the task genuinely
 needs that capability and its permission, availability, error, and fallback

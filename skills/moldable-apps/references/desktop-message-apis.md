@@ -27,7 +27,7 @@ window.parent.postMessage(
 The host opens Finder on macOS, Explorer on Windows, or the platform file
 manager on supported Linux desktops.
 
-## Populate the Moldable chat input
+## Populate the app's channel input
 
 ```typescript
 window.parent.postMessage(
@@ -36,9 +36,15 @@ window.parent.postMessage(
 )
 ```
 
-This also expands the chat panel.
+This also expands the host channel panel. The prompt goes to the bot/group
+channel currently assigned to this app (or the workspace's latest visible
+channel when the app has no pin).
 
-## Set app-specific chat context
+This message cannot select or create a channel. When a user asks to pin an app
+to a bot or group, the agent must use `assignAppChatChannel`; the host persists
+that workspace-scoped assignment.
+
+## Set app-specific channel context
 
 ```typescript
 window.parent.postMessage(
@@ -57,7 +63,9 @@ window.parent.postMessage(
 ```
 
 The host clears these instructions when the user switches apps or workspaces.
-Send only the minimum context the agent needs.
+They inform the current app-channel turn only; they do not change the selected
+bot/group or create a private app conversation. Send only the minimum context
+the agent needs.
 
 ## Save a file
 

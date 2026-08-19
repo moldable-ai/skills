@@ -1,8 +1,8 @@
 # Standalone windows
 
 Moldable apps should feel complete when opened as independent tools. The system
-can present several apps at once while chat remains an external orchestrator
-rather than permanent in-app chrome.
+can present several apps at once while the host bot/group channel remains an
+external orchestrator rather than permanent in-app chrome.
 
 ## Ownership boundary
 
@@ -60,10 +60,10 @@ Build one app hierarchy that adapts to both presentations.
 | Concern | Standalone window | Embedded view |
 | --- | --- | --- |
 | Global navigation | External to the app | Provided by the desktop |
-| Chat | Separate orchestrator surface | May overlap using a host safe area |
+| Host channel panel | Separate orchestrator surface | May overlap using a host safe area |
 | Top inset | Host-supplied window value | Usually zero or host-supplied |
 | Title | App-owned, within the safe region | May collapse when host context is clear |
-| Bottom tools | App-owned status/tool region | Must respect chat-safe spacing |
+| Bottom tools | App-owned status/tool region | Use ordinary window/mobile-safe spacing |
 
 Do not fork the whole UI tree for each presentation. Adapt frame regions and
 optional chrome while preserving the same commands, selection, and content.

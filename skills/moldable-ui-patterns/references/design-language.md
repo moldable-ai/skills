@@ -38,9 +38,9 @@ The host owns native chrome and supplies window insets. The app owns content
 below those insets. A standalone window and an embedded view should share one
 content hierarchy rather than becoming two separate products.
 
-Chat is an orchestrator surface. It may be external to the app or temporarily
-overlap an embedded presentation, so app layout must not assume permanent chat
-chrome.
+The host bot/group channel is an orchestrator surface. It may be external to
+the app or temporarily overlap an embedded presentation, so app layout must
+not assume permanent channel chrome.
 
 ## Start with the object
 

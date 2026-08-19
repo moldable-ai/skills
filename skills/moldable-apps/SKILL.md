@@ -46,7 +46,7 @@ source.
   same `AppFrame` hierarchy usable in the embedded compatibility/fallback
   surface, but do not design a web page or simulate macOS window chrome.
 - Users can enable **Voice mode** in Settings on supported macOS builds. Voice
-  and chat must drive the same workspace-scoped app APIs and semantic actions;
+  and every bot/group channel must drive the same workspace-scoped app APIs and semantic actions;
   do not create a voice-only app implementation.
 - Treat iPhone as a native semantic projection over the same authoritative app
   state, not a second app implementation. Use `nativeUI` only when the current
@@ -84,7 +84,30 @@ The home screen is the host-rendered **Today** view. Apps participate by impleme
 
 ### Drive contract
 
-Every new app must be drivable by chat and voice from day one. Declare an `<appId>.drive` capability with fully prefixed `<appId>.ui.describe`, `<appId>.ui.navigate`, and `<appId>.ui.read` scopes; implement the workspace-scoped UI-intent flow; and listen for `moldable:app-api-changed` in the client. Add model-readable signature actions for the app's important verbs. Follow [references/app-to-app-communication.md](references/app-to-app-communication.md#drive-contract-voice--chat-steering) for the complete contract and Plants reference code.
+Every new app must be drivable from bot channels, group channels, and voice from day one. Declare an `<appId>.drive` capability with fully prefixed `<appId>.ui.describe`, `<appId>.ui.navigate`, and `<appId>.ui.read` scopes; implement the workspace-scoped UI-intent flow; and listen for `moldable:app-api-changed` in the client. Add model-readable signature actions for the app's important verbs. Follow [references/app-to-app-communication.md](references/app-to-app-communication.md#drive-contract-voice--channel-steering) for the complete contract and Plants reference code.
+
+### Bot/group channels and app assignment
+
+Moldable conversations are durable, workspace-scoped **channels**: a one-to-one
+channel has one bot, while a group channel has multiple collaborating bots.
+Their channel and conversation identities are the same. Never create an
+app-specific chat identity, duplicate a bot's state, or store a channel choice
+inside the app's own data.
+
+An app's embedded host channel panel uses its explicit channel assignment when one
+exists; otherwise it follows the latest visible channel in that workspace. When
+the user asks to make an app use a particular bot or group, call
+`assignAppChatChannel` from the app's channel context:
+
+- use `appId` from the app context or app catalog;
+- provide an exact visible bot/group name or channel ID in `channelName` (do
+  not derive channel IDs from names); and
+- set `useLatest: true` to remove the pin and resume following the latest
+  channel.
+
+The assignment is host-owned and workspace-scoped. App code may prefill the
+currently assigned channel or give it bounded app context through the desktop
+messages, but cannot choose or persist a channel by `postMessage`.
 
 ### Native iPhone projection
 
@@ -143,9 +166,14 @@ For every creation:
 4. Keep `includeSuccessesInToday` false unless the user explicitly wants every
    successful run shown. The default keeps routine results quiet while blocked
    or failed work can still surface in Today.
-5. Use `maxRuns` for a bounded series. Omit it for an unbounded recurring
+5. If the user wants a bot or group to receive the result, provide that
+   workspace's exact `channelId`. The automation posts a durable outcome there
+   and wakes the recipient to handle useful follow-up; it may remain quiet when
+   no response is warranted. Omit `channelId` for Today/history-only delivery.
+   Do not infer an ID from a bot or group name.
+6. Use `maxRuns` for a bounded series. Omit it for an unbounded recurring
    schedule.
-6. After creation, quote the returned `schedule.confirmationText`; do not
+7. After creation, quote the returned `schedule.confirmationText`; do not
    reinterpret or recompute the schedule.
 
 Creating or updating `appAccess` grants those declared scopes to the
@@ -155,11 +183,13 @@ with `listMoldableAppApi`, then use `updateAutomation` only when the user has
 authorized that access.
 
 Use `listAutomations` and `getAutomation` to resolve an existing item before
-acting. Use `updateAutomation` for its name, prompt, app access, or Today policy;
-`toggleAutomation` to pause or resume it; `runAutomationNow` for an immediate
-run; and `deleteAutomation` to remove it. The chat update tool does not change
-schedules: create and verify a replacement schedule first, then delete the old
-automation only when the user's request clearly authorizes replacement.
+acting. Use `updateAutomation` for its name, prompt, app access, Today policy,
+or report channel; use `channelId: null` to return to Today/history-only
+delivery. Use `toggleAutomation` to pause or resume it; `runAutomationNow` for
+an immediate run; and `deleteAutomation` to remove it. Updating an automation
+does not change its schedule: create and verify a replacement schedule first,
+then delete the old automation only when the user's request clearly authorizes
+replacement.
 
 ## Detailed References
 
@@ -186,7 +216,7 @@ Read these for in-depth guidance:
 - [references/storage-patterns.md](references/storage-patterns.md) — Filesystem storage, React Query, workspace-aware APIs
 - [references/browser-storage-audit.md](references/browser-storage-audit.md) — Current browser storage usage and migration guidance
 - [references/desktop-apis.md](references/desktop-apis.md) — Router for desktop integration APIs
-- [references/desktop-message-apis.md](references/desktop-message-apis.md) — Window, chat, file, and artifact postMessage APIs
+- [references/desktop-message-apis.md](references/desktop-message-apis.md) — Window, channel-context, file, and artifact postMessage APIs
 - [references/native-apis.md](references/native-apis.md) — Typed native capability API overview and usage rules; route native-capability UI through [references/ui.md](references/ui.md)
 - [references/native-api-support.md](references/native-api-support.md) — Native capability support matrix and permission summary
 - [references/native-api-permissions.md](references/native-api-permissions.md) — `nativeCapabilities` declarations and per-app workspace grants
@@ -266,8 +296,8 @@ export before using it, then read the guide for each selected family.
 
 Install the shared frame lifecycle once in the client entry and begin full app
 views with `AppFrame`. Use adaptive `Material` only for navigation and control
-chrome; keep primary content opaque. Do not add app-local chat-safe-area
-listeners.
+chrome; keep primary content opaque. Do not add app-local channel-layout
+listeners: desktop currently publishes `--chat-safe-padding: 0px`.
 
 For native capability UI (camera, microphone, location, serial, Bluetooth,
 and related services), start with the package's
@@ -315,13 +345,13 @@ window.parent.postMessage(
   "*",
 );
 
-// Pre-populate chat input
+// Pre-populate the app's assigned bot/group channel input
 window.parent.postMessage(
   { type: "moldable:set-chat-input", text: "Help me..." },
   "*",
 );
 
-// Provide context to AI
+// Provide bounded context to the app's assigned bot/group channel
 window.parent.postMessage(
   {
     type: "moldable:set-chat-instructions",
@@ -405,7 +435,7 @@ await runCommand({
     ├── config.json                 # Registered apps
     ├── .env                        # Workspace env overrides
     ├── apps/{app-id}/data/         # App runtime data
-    └── conversations/              # Chat history
+    └── conversations/              # Bot and group-channel conversation history
 ```
 
 ## Common Mistakes to Avoid

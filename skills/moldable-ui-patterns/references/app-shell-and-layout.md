@@ -9,7 +9,7 @@
 - [Split views](#split-views)
 - [Inspector](#inspector)
 - [Lists and navigation](#lists-and-navigation)
-- [Chat-safe spacing](#chat-safe-spacing)
+- [Bottom clearance](#bottom-clearance)
 - [Responsive collapse](#responsive-collapse)
 
 ## Choose one archetype
@@ -30,7 +30,7 @@ Do not add a sidebar or inspector without distinct content that must remain visi
 
 Design the hierarchy standalone-first: the app may occupy an independent native
 window with no surrounding Moldable navigation. Embedded presentation can
-collapse redundant identity and receives chat-safe insets from the host.
+collapse redundant identity and receives ordinary window insets from the host.
 
 Use `AppFrame`, `AppFrameTitlebar`, `AppFrameToolbar`, `AppFrameContent`, and
 `AppFrameStatusbar` for shared frame ownership when their public API matches the
@@ -134,11 +134,15 @@ before it. Use one row action affordance; move secondary actions into a menu.
 `Sidebar` is appropriate for app-owned navigation with enough durable
 destinations. Do not reproduce global host navigation in either presentation.
 
-## Chat-safe spacing
+## Bottom clearance
 
-The Moldable chat UI can overlap the bottom edge in embedded presentation.
-Prefer `AppFrameContent`, which consumes the shared safe-area contract. For a
-custom owning scroll region, use the public safe-area token:
+The Moldable host channel panel may overlap the embedded view, but desktop
+currently reserves no layout space for it: `--chat-safe-padding` is `0px` in
+every channel state. Prefer `AppFrameContent`, which consumes ordinary host
+window insets. Do not add a custom desktop channel offset.
+
+Shared primitives can retain the token to be safe on mobile web, where it maps
+to bottom clearance. For a custom mobile-safe scroll region, use it once:
 
 ```tsx
 <div className="min-h-0 flex-1 overflow-y-auto pb-[calc(var(--chat-safe-padding,0px)+1rem)]">

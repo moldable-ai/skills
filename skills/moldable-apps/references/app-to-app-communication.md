@@ -42,9 +42,11 @@ Apps declare app-to-app capabilities in `moldable.json`:
 }
 ```
 
-## Drive contract (voice + chat steering)
+## Drive contract (voice + channel steering)
 
-Every new app must be steerable through the same private app API used by chat and voice. Put the drive surface under one `<appId>.drive` capability, and fully prefix every scope id with `<appId>.`:
+Every new app must be steerable through the same private app API used by bot
+channels, group channels, and voice. Put the drive surface under one
+`<appId>.drive` capability, and fully prefix every scope id with `<appId>.`:
 
 ```json
 {

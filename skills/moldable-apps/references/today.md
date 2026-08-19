@@ -51,14 +51,14 @@ Build plain objects — do **not** import shared types.
 ```ts
 { type: 'open-app', label, deepLink? }            // open the app (deep-link to an entity)
 { type: 'rpc', label, method, params?, confirm? } // call THIS app's own /api/moldable/rpc method in place
-{ type: 'message', label, prompt }                // load the unified chat with a prompt to act / interrogate
+{ type: 'message', label, prompt }                // open the active host channel with a prompt to act / interrogate
 { type: 'navigate', label, path }                 // open the app at a path
 ```
 
 Pick the **richest** action available:
 
 - The app can do it in place → `rpc` calling a real method from your `/api/moldable/rpc` handler.
-- It needs reasoning / multiple steps → `message` that loads the chat with a **specific** prompt
+- It needs reasoning / multiple steps → `message` that opens the active bot/group channel with a **specific** prompt
   (include the actual offending details). End such prompts with: _"When you're done, refresh the
   home view by calling the Moldable app API with targetAppId "today" and method "today.refresh"."_
 - Otherwise → `open-app` (use `deepLink` so it lands on the right entity).

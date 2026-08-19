@@ -36,7 +36,7 @@ Workspaces allow users to organize their Moldable environment into separate cont
     │   ├── .env                    # Workspace-specific env overrides
     │   ├── apps/                   # App runtime data
     │   │   └── {app-id}/data/      # Per-app data
-    │   ├── conversations/          # Chat history
+    │   ├── conversations/          # Bot and group-channel conversation history
     │   └── config/
     │       ├── mcp.json            # Workspace-specific MCPs
     │       └── skills.json         # Enabled skills

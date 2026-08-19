@@ -40,8 +40,8 @@ Build interfaces that feel like focused desktop tools: quiet, compact, responsiv
 7. Cover the result in the component catalog or app tests as appropriate,
    including interaction states instead of only the ready screenshot.
 8. Review keyboard access, focus behavior, labels, reduced motion, narrow
-   windows, light and dark themes, standalone presentation, and embedded
-   chat-safe spacing.
+   windows, light and dark themes, standalone presentation, and mobile/window
+   safe-area spacing.
 
 ## Non-negotiables
 
@@ -73,9 +73,9 @@ Build interfaces that feel like focused desktop tools: quiet, compact, responsiv
   `Kbd` for shortcuts.
 - Give every icon-only action an accessible name and tooltip where the meaning is not obvious.
 - Use `Button` for actions. If a native `<button>` is unavoidable, include `cursor-pointer` and a disabled cursor.
-- Keep the host's chat overlay clear through the shared frame lifecycle and
-  safe-area tokens. Never add an app-local `window.message` listener for chat
-  overlap.
+- Do not reserve desktop space for the host channel panel: the shared lifecycle
+  currently publishes `--chat-safe-padding: 0px`. Never add an app-local
+  `window.message` listener to react to channel layout.
 - Keep native capability behavior behind typed host contracts with a portable
   fallback. A UI component must not call one platform's bridge directly. Read
   the colocated host-service guide before using native menus, file/date pickers,

@@ -22,8 +22,9 @@ macOS window chrome, create marketing-style cards, or introduce raw palette
 colors.
 
 The app must be complete in its own window. The host owns native chrome,
-environment insets, menus, share sheets, and pickers. Chat is an external
-orchestrator or an embedded safe-area constraint, not permanent app navigation.
+environment insets, menus, share sheets, and pickers. The host bot/group
+channel is an external orchestrator, not permanent app navigation. It does not
+reserve desktop app layout space.
 
 Required decisions
 1. Name the screen archetype: focused workspace, master/detail,
@@ -43,7 +44,7 @@ Required decisions
 6. Specify keyboard path, focus movement, labels, announcements, reduced motion,
    reduced transparency, and narrow-width collapse.
 7. Preserve ThemeProvider, WorkspaceProvider, semantic tokens, and the shared
-   frame lifecycle. Do not add app-local chat-safe-area listeners.
+   frame lifecycle. Do not add app-local channel-layout listeners.
 8. Route menus, sharing, and native date behavior through typed cross-client
    host contracts with portable fallbacks.
 
