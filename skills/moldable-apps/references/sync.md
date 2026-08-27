@@ -52,10 +52,11 @@ Large or ambiguous deletion sets are protected: the daemon can defer propagation
 ## Builder rules
 
 1. Store durable app state only under the host-provided workspace app-data root; scope every API, cache key, and migration by workspace id.
-2. Keep secrets, tokens, logs, caches, generated builds, dependencies, and runtime locks out of durable app state. Use host secure-storage/permission APIs for secrets and privileged access.
+2. Keep secrets, tokens, logs, caches, generated builds, dependencies, and runtime locks out of durable app state. Put safely rebuildable app caches under `getAppCacheDir(workspaceId)`; use host secure-storage/permission APIs for secrets and privileged access.
 3. Make writes crash-safe and retry-safe. On reload or remote materialization, validate data, tolerate duplicates/replays, and surface recoverable conflicts instead of overwriting data.
 4. Treat a workspace's source installation and its data as separate lifecycle domains: source may be signed/released/restarted; data must remain workspace-scoped and migration-compatible.
 5. Do not add app-specific direct calls to the sync Worker, daemon, Drive state files, or iOS relay to synchronize data. Those are host-owned transports. Expose ordinary workspace-aware app APIs; the desktop/remote projection is the integration boundary.
+6. Prefer provider cursors/deltas and no-op-aware cache writes over repeated full scans. A frequently rewritten SQLite/cache file inside durable app data is still sync churn, even when it replaces many smaller files.
 
 ## Known limits
 

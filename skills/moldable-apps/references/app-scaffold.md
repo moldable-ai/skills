@@ -227,4 +227,10 @@ Expose `GET /api/moldable/health` from the Hono app and return the running `appI
 
 Do not use `localStorage` or `sessionStorage` for app data, user preferences, workspace settings, durable caches, OAuth state, or secrets. Persist via server APIs and `@moldable-ai/storage`.
 
-Use `getAppDataDir(workspaceId)` for every value that should survive reloads, participate in backups, be visible to app RPC, or stay isolated per workspace. `sessionStorage` is acceptable only for disposable same-session UI state that can be lost without changing app behavior.
+Use `getAppDataDir(workspaceId)` for every value that should participate in
+backups or cannot be reconstructed safely, including user work, preferences,
+and event-loss-prevention cursors. Use `getAppCacheDir(workspaceId)` for
+server-side provider responses, derived indexes, thumbnails, and other state
+that may survive reloads but is safe for the host to purge. `sessionStorage` is
+acceptable only for disposable same-session UI state that can be lost without
+changing app behavior.

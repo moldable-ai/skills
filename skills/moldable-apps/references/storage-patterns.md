@@ -9,6 +9,8 @@ Moldable is local-first and workspace-based. Apps must isolate data per workspac
 3. Use `@moldable-ai/storage` helpers on the server.
 4. Use `fetchWithWorkspace` on the client.
 5. Include `workspaceId` in React Query keys.
+6. Separate synced durable state (`getAppDataDir`) from local rebuildable state (`getAppCacheDir`).
+7. Write caches only when semantic content changes; polling is not a reason to touch every record.
 
 ## Browser Storage Anti-Pattern
 
@@ -21,7 +23,10 @@ Do not use browser storage for:
 - API keys, OAuth state, tokens, or other secrets
 - durable client caches of server data
 
-Use app server routes backed by `getAppDataDir(workspaceId)` instead. Client code should load those settings/data with `fetchWithWorkspace` and React Query keys that include `workspaceId`.
+Use app server routes backed by `getAppDataDir(workspaceId)` for durable state
+or `getAppCacheDir(workspaceId)` for safely rebuildable state instead. Client
+code should load those settings/data with `fetchWithWorkspace` and React Query
+keys that include `workspaceId`.
 
 The only acceptable browser storage use is disposable UI state that does not need backup, sync, migration, RPC access, or cross-session durability. Prefer React state for this. If state should survive app reloads or workspace switches, it belongs in workspace-scoped app storage.
 
@@ -33,6 +38,39 @@ The only acceptable browser storage use is disposable UI state that does not nee
 ├── attachments/
 └── database.sqlite
 ```
+
+Use this directory for user-authored data, durable preferences, drafts,
+account configuration, continuity cursors/checkpoints that prevent event loss,
+and other state that cannot be reconstructed safely.
+
+## Rebuildable Cache Directory
+
+```text
+~/.moldable/cache/workspaces/{workspace-id}/apps/{app-id}/
+├── provider-responses/
+├── thumbnails/
+└── search-index/
+```
+
+Resolve it with `getAppCacheDir(workspaceId)`. It is intentionally excluded
+from Moldable Drive and is cleared when the app is removed from that workspace,
+its data is reset, or the app is fully uninstalled. Therefore:
+
+- cache loss must never lose user work or make the app unrecoverable;
+- every cache must be rebuildable from durable state or its provider;
+- scope the cache by the request's workspace just like durable data;
+- use provider history/cursors or other deltas for routine refreshes, with an
+  infrequent bounded reconciliation as a safety net;
+- compare semantic content and skip no-op writes—do not update `cachedAt`,
+  SQLite rows, or every per-item file merely because a timer fired; and
+- do not put a frequently rewritten cache database under `getAppDataDir()`.
+  Consolidating churn into one synced SQLite file still uploads/churns the
+  whole mutable file and its sidecars.
+
+During a migration from a cache formerly stored in durable data, prefer a
+one-time non-destructive copy into `getAppCacheDir()` plus a small durable
+migration marker. Leave the legacy tree frozen until a separately planned
+cleanup so the migration itself does not create a large synchronized deletion.
 
 ## Client Pattern
 
@@ -75,6 +113,7 @@ function Items() {
 ```ts
 import {
   generateId,
+  getAppCacheDir,
   getAppDataDir,
   getWorkspaceFromRequest,
   readJson,
@@ -136,6 +175,7 @@ app.delete('/api/items/:id', async (c) => {
 import {
   getMoldableHome,
   getWorkspaceId,
+  getAppCacheDir,
   getAppDataDir,
   getAppId,
   isRunningInMoldable,

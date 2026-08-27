@@ -9,15 +9,16 @@ This skill provides comprehensive knowledge for building and modifying apps with
 
 ## Quick Reference
 
-| Resource         | Path                                                        |
-| ---------------- | ----------------------------------------------------------- |
-| App source code  | `~/.moldable/shared/apps/{app-id}/`                         |
-| App runtime data | `~/.moldable/workspaces/{workspace-id}/apps/{app-id}/data/` |
-| Workspace config | `~/.moldable/workspaces/{workspace-id}/config.json`         |
-| MCP config       | `~/.moldable/shared/config/mcp.json`                        |
-| Skills           | `~/.moldable/shared/skills/{repo}/{skill}/`                 |
-| Environment      | `~/.moldable/shared/.env`                                   |
-| Native iOS UI    | `nativeUI` tool in a first-party iOS conversation           |
+| Resource          | Path                                                         |
+| ----------------- | ------------------------------------------------------------ |
+| App source code   | `~/.moldable/shared/apps/{app-id}/`                          |
+| Durable app data  | `~/.moldable/workspaces/{workspace-id}/apps/{app-id}/data/`  |
+| Rebuildable cache | `~/.moldable/cache/workspaces/{workspace-id}/apps/{app-id}/` |
+| Workspace config  | `~/.moldable/workspaces/{workspace-id}/config.json`          |
+| MCP config        | `~/.moldable/shared/config/mcp.json`                         |
+| Skills            | `~/.moldable/shared/skills/{repo}/{skill}/`                  |
+| Environment       | `~/.moldable/shared/.env`                                    |
+| Native iOS UI     | `nativeUI` tool in a first-party iOS conversation            |
 
 ## Default Tech Stack
 
@@ -312,7 +313,11 @@ All apps **must** isolate data per workspace:
 
 ```tsx
 // Server - extract workspace from request
-import { getAppDataDir, getWorkspaceFromRequest } from "@moldable-ai/storage";
+import {
+  getAppCacheDir,
+  getAppDataDir,
+  getWorkspaceFromRequest,
+} from "@moldable-ai/storage";
 
 // Client - use workspaceId in query keys
 const { workspaceId, fetchWithWorkspace } = useWorkspace();
@@ -324,9 +329,21 @@ const { data } = useQuery({
 export async function GET(request: Request) {
   const workspaceId = getWorkspaceFromRequest(request);
   const dataDir = getAppDataDir(workspaceId);
-  // Read/write files in dataDir
+  const cacheDir = getAppCacheDir(workspaceId);
+  // User-authored/irreplaceable state and event-loss-prevention cursors go in
+  // dataDir. Provider responses, derived indexes, thumbnails, and other safely
+  // rebuildable state go in cacheDir.
 }
 ```
+
+The cache directory is local-only and follows app lifecycle: removing an app
+from a workspace, deleting its data, or fully uninstalling it clears the
+applicable cache. Cache loss must never break correctness or lose user work.
+Persist only semantic cache changes—do not refresh timestamps or rewrite every
+record on a polling heartbeat. Prefer provider cursors/deltas plus infrequent
+bounded reconciliation over repeated full scans. Moving a frequently rewritten
+cache into one SQLite file under `getAppDataDir()` does not make it sync-safe;
+it still causes whole-file Drive churn.
 
 ### 3. Desktop Integration
 
@@ -422,6 +439,8 @@ await runCommand({
 
 ```
 ~/.moldable/
+├── cache/
+│   └── workspaces/{workspace-id}/apps/{app-id}/ # Rebuildable, unsynced app cache
 ├── shared/
 │   ├── apps/{app-id}/              # App source code
 │   │   ├── moldable.json           # App manifest
@@ -434,7 +453,7 @@ await runCommand({
 └── workspaces/{workspace-id}/
     ├── config.json                 # Registered apps
     ├── .env                        # Workspace env overrides
-    ├── apps/{app-id}/data/         # App runtime data
+    ├── apps/{app-id}/data/         # Durable app data
     └── conversations/              # Bot and group-channel conversation history
 ```
 
@@ -444,8 +463,10 @@ await runCommand({
 2. **❌ Using localStorage/sessionStorage for app data or settings** — Use workspace-scoped server APIs and `@moldable-ai/storage`; browser storage is only acceptable for disposable same-session UI state.
 3. **❌ Forgetting workspaceId** — Include in query keys and API calls
 4. **❌ Hardcoding paths** — Use `getAppDataDir()` for portability
-5. **❌ Using raw colors** — Use shadcn semantic colors (`bg-background`, not `bg-gray-100`)
-6. **❌ Running pnpm with sandbox** — Set `sandbox: false` for network access
+5. **❌ Syncing provider caches or derived indexes** — Use `getAppCacheDir()` and make cache loss safe
+6. **❌ Touching every cache record on a timer** — Compare semantic content and write only changes
+7. **❌ Using raw colors** — Use shadcn semantic colors (`bg-background`, not `bg-gray-100`)
+8. **❌ Running pnpm with sandbox** — Set `sandbox: false` for network access
 
 ## Study Existing Apps
 
