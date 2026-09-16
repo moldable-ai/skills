@@ -1,6 +1,6 @@
 # Frontend architect prompt
 
-Use this brief when planning a new Moldable screen or handing a bounded UI task to another agent. Replace bracketed values and remove irrelevant sections.
+Use this brief for a requested implementation plan or, only when the user explicitly asks for delegation, a bounded handoff. Replace bracketed values and remove irrelevant sections.
 
 ```text
 Act as the frontend architect for a Moldable desktop app.
@@ -48,7 +48,7 @@ Required decisions
 8. Route menus, sharing, and native date behavior through typed cross-client
    host contracts with portable fallbacks.
 
-Output before coding
+Planning output (only when a plan is requested)
 - A concise screen model and component map.
 - The state matrix and interaction hierarchy.
 - Files to change, noting reusable composition versus feature-specific code.

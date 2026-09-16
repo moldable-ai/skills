@@ -12,7 +12,11 @@ credentials:
 
 This skill uses aivault to keep your Google Places API key safe.
 
-## Setup
+## Setup when missing
+
+Use an existing configured capability first. Follow this section only when the
+requested capability is unavailable; do not recreate secrets for ordinary calls.
+
 
 Install `aivault` if it is not already available:
 

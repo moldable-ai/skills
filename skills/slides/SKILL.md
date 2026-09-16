@@ -1,6 +1,6 @@
 ---
 name: slides
-description: Author, review, and template beautiful responsive presentations and interactive web artifacts in the Moldable Slides and Artifacts apps. Use when the user wants to create or edit a slide deck, pitch, talk, interactive report, calculator/chart/table experience, durable runtime state, deck/page template, or publishable artifact in Moldable. Covers optional deck runtimes, staged builds, responsive page/deck authoring, persistence, and the Slides/Artifacts RPC APIs instead of standalone files.
+description: "Create or edit presentations and interactive pages in Moldable Slides or Artifacts using their app APIs."
 ---
 
 # Slides & Artifacts (Moldable)
@@ -118,18 +118,12 @@ design constraints):
 
 ## Workflow
 
-### Phase 1 — Discover
+### Establish the brief
 
-Establish, ideally with one structured set of questions (use `AskUserQuestion`
-when available):
-
-1. **Purpose** — pitch / teaching / conference talk / internal.
-2. **Length** — short (5–10) / medium (10–20) / long (20+).
-3. **Content** — ready text / rough notes / topic only. If they have content,
-   ask for it.
-4. **Density** — _low/speaker-led_ (big ideas, few words, more slides) vs
-   _high/reading-first_ (self-contained, structured, more detail per slide).
-   This drives slide count, type scale, and amount of text per slide.
+Use the supplied content, audience, purpose, length, and density. Infer reasonable
+defaults for gaps; ask only when a missing choice materially changes the deck.
+Do not repeat discovery questions already answered by the request. A small edit
+to an existing deck does not require revisiting its style or narrative.
 
 ### Phase 2 — Choose a look
 
@@ -156,9 +150,9 @@ CSS-only background decoration, see
 [references/animation-patterns.md](references/animation-patterns.md) (the app
 already wires `.reveal` and the enter transitions — you only add bespoke touches).
 
-When unsure, create the deck with a strong title slide first and let the user
-react to the live preview, then iterate. The app shows changes instantly — lean
-on "show, don't tell."
+Use the live preview to verify the deck as you work. Complete the requested deck
+and fix visible issues before returning it, unless the user requested a concept
+review checkpoint.
 
 ### Phase 3 — Generate
 

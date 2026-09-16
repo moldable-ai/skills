@@ -12,7 +12,11 @@ credentials:
 
 This skill uses aivault to keep your Notion token safe. The scripts only invoke aivault capabilities; they never read env vars or local key files.
 
-## Setup
+## Setup when missing
+
+Use an existing configured capability first. Follow this section only when the
+requested capability is unavailable; do not recreate secrets for ordinary calls.
+
 
 Install `aivault` if it is not already available:
 

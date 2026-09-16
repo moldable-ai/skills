@@ -12,7 +12,11 @@ credentials:
 
 This skill uses `aivault` to keep your Firecrawl API key safe. Agents invoke named capabilities; the API key is injected only by the aivault broker and is never exposed to the skill runtime.
 
-## Setup
+## Setup when missing
+
+Use an existing configured capability first. Follow this section only when the
+requested capability is unavailable; do not recreate secrets for ordinary calls.
+
 
 Install `aivault` if it is not already available:
 

@@ -1,47 +1,40 @@
 ---
 name: moldable-ui-patterns
-description: Design, implement, or audit polished standalone-window and embedded Moldable app interfaces using the public @moldable-ai/ui API. Use for visible React UI work, semantic token and density decisions, component selection, keyboard-aware collections, app-shell and inspector layouts, interaction-state design, accessibility reviews, catalog coverage, design-system migrations, and frontend implementation briefs.
+description: "Build or review Moldable React app interfaces using @moldable-ai/ui. Excludes native iPhone projections."
 ---
 
 # Moldable UI Patterns
 
 Build interfaces that feel like focused desktop tools: quiet, compact, responsive, and complete in every state.
 
-## Workflow
+## Guidance by task
 
-1. Identify the product task, primary object, and dominant interaction before choosing components.
-2. Read [references/design-language.md](references/design-language.md) and
-   [references/component-index.md](references/component-index.md) for all
-   visible UI work. Read
-   [references/tokens-and-materials.md](references/tokens-and-materials.md)
-   when choosing a surface, density, material, or token.
-3. Read only the additional references needed:
-   - Standalone windows, shells, panes, inspectors, scrolling, or chat overlap:
-     [references/app-shell-and-layout.md](references/app-shell-and-layout.md)
-     and [references/standalone-windows.md](references/standalone-windows.md)
-   - Forms, menus, async actions, selection, loading, or errors: [references/interaction-states.md](references/interaction-states.md)
-   - Lists, grids, segmented choices, date entry, search, icon actions, or toasts:
-     [references/collection-and-control-patterns.md](references/collection-and-control-patterns.md)
-   - New controls or accessibility review: [references/accessibility.md](references/accessibility.md)
-   - Component adoption, catalog work, or migration:
-     [references/catalog-and-migration.md](references/catalog-and-migration.md)
-   - Planning a new screen or delegating implementation: [references/frontend-architect-prompt.md](references/frontend-architect-prompt.md)
-4. Select the semantic component family, then read its colocated guide before
-   coding. In an installed package use
-   `node_modules/@moldable-ai/ui/src/components/ui/<component>.md`; in the
-   desktop monorepo use
-   `packages/ui/src/components/ui/<component>.md`. For host services, read the
-   matching `src/lib/<service>.md`. Inspect the package-root export before using
-   an uncertain API. Import only from `@moldable-ai/ui`; documentation paths
-   are for reading, never import paths.
-5. Choose one screen archetype, assign one owner for each scroll region, and specify loading, empty, error, ready, and disabled states before implementation.
-6. Implement with semantic tokens and shared components. Keep feature-specific
-   composition in the app instead of adding one-off variants to the kit.
-7. Cover the result in the component catalog or app tests as appropriate,
-   including interaction states instead of only the ready screenshot.
-8. Review keyboard access, focus behavior, labels, reduced motion, narrow
-   windows, light and dark themes, standalone presentation, and mobile/window
-   safe-area spacing.
+Preserve the existing screen structure for small edits. For a new screen or
+substantial redesign, choose its primary object, interaction, shell, and relevant
+states before composing it.
+
+Read only the guidance needed for the changed behavior:
+
+- Design direction: [design-language](references/design-language.md).
+- Choosing a component: [component-index](references/component-index.md), then
+  the selected family's colocated guide if its API or behavior is unfamiliar.
+- Surface, density, or material: [tokens-and-materials](references/tokens-and-materials.md).
+- Shells and window layout: [app-shell-and-layout](references/app-shell-and-layout.md)
+  and [standalone-windows](references/standalone-windows.md).
+- Forms and async states: [interaction-states](references/interaction-states.md).
+- Collections and controls: [collection-and-control-patterns](references/collection-and-control-patterns.md).
+- New controls or accessibility review: [accessibility](references/accessibility.md).
+- Catalog changes or migration: [catalog-and-migration](references/catalog-and-migration.md).
+- An implementation brief, when requested: [frontend-architect-prompt](references/frontend-architect-prompt.md).
+
+Component guides live in `node_modules/@moldable-ai/ui/src/components/ui/`
+or the desktop monorepo's `packages/ui/src/components/ui/`. Host-service guides
+live beside the corresponding `src/lib/` modules. These are documentation paths;
+import public APIs only from `@moldable-ai/ui`.
+
+Verify the affected interactions and states. Expand keyboard, theme, width,
+window, and accessibility checks when shared layout or control behavior changes;
+a text or spacing correction does not require a whole-screen audit.
 
 ## Non-negotiables
 
