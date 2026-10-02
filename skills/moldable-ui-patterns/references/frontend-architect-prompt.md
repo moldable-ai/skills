@@ -6,17 +6,20 @@ Use this brief for a requested implementation plan or, only when the user explic
 Act as the frontend architect for a Moldable desktop app.
 
 Task
-[Describe the user job, primary object, and desired outcome.]
+[Describe this person’s job or experience, primary object, and desired outcome.]
 
 Context
 - App/repository: [path]
+- Established personal context: [relevant vocabulary, constraints, preferences, corrections]
 - Existing screen/components: [paths]
 - Data and mutations: [contracts or paths]
 - Presentation: [standalone window, embedded, or both]
 - Constraints: React 19, TypeScript strict, Tailwind CSS 4, @moldable-ai/ui.
 
 Design target
-Create a quiet, compact desktop tool with one dominant work surface. Use
+Choose a focused composition and density for this person’s purpose. Preserve
+useful data and intentional adaptations; omit controls and features that do not
+serve the request. Enjoyment can be a complete outcome without task tracking. Use
 Moldable's semantic theme and public package-root components. Do not imitate
 macOS window chrome, create marketing-style cards, or introduce raw palette
 colors.
@@ -27,8 +30,8 @@ channel is an external orchestrator, not permanent app navigation. It does not
 reserve desktop app layout space.
 
 Required decisions
-1. Name the screen archetype: focused workspace, master/detail,
-   workspace/inspector, three-pane browser, or dashboard.
+1. Explain what established personal context changes about the design. Choose
+   or adapt a fitting composition; archetypes are starting points, not requirements.
 2. Define region hierarchy and identify the single owner of scrolling in each
    axis.
 3. Define standalone and embedded frame behavior, host-supplied insets, narrow
@@ -51,6 +54,8 @@ Required decisions
 Planning output (only when a plan is requested)
 - A concise screen model and component map.
 - The state matrix and interaction hierarchy.
+- What is useful now, deferred until needed, or removed for this person; verify
+  the simpler journey preserves task completion and access to occasional essentials.
 - Files to change, noting reusable composition versus feature-specific code.
 - Any missing public primitive that blocks a correct implementation. Do not
   deep-import internal files.

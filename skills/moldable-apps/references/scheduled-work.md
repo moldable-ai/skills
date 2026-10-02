@@ -67,4 +67,3 @@ an immediate run; and `deleteAutomation` to remove it. Updating an automation
 does not change its schedule: create and verify a replacement schedule first,
 then delete the old automation only when the user's request clearly authorizes
 replacement.
-

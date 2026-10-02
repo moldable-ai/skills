@@ -1,6 +1,11 @@
 ## Creating Apps
 
-**ALWAYS use the `scaffoldApp` tool** — never create app files manually.
+Before scaffolding, use the established request and context to determine whether
+the person needs a new app or an improvement to an existing one. Keep the scope
+specific; do not add a standard suite of features just because similar products
+have them. Reuse a fitting existing app when that satisfies the request.
+
+For a new app, **always use the `scaffoldApp` tool** — never create app files manually.
 
 ```typescript
 scaffoldApp({
@@ -51,4 +56,3 @@ the user asks to make an app use a particular bot or group, call
 The assignment is host-owned and workspace-scoped. App code may prefill the
 currently assigned channel or give it bounded app context through the desktop
 messages, but cannot choose or persist a channel by `postMessage`.
-

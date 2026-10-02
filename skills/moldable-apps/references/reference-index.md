@@ -48,4 +48,3 @@ Read these for in-depth guidance:
 - [references/artifact-publishing.md](artifact-publishing.md) — Publishing public unlisted HTML/CSS/asset bundles through Moldable Artifacts
 - [references/app-to-app-communication.md](app-to-app-communication.md) — App-to-app RPC, capability manifests, workspace-scoped grants, Calendar-owned OAuth/data access
 - [references/skills-mcps.md](skills-mcps.md) — Skills library, MCP configuration, custom MCP servers
-

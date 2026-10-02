@@ -2,6 +2,7 @@
 
 ## Contents
 
+- [Personal purpose](#personal-purpose)
 - [Character](#character)
 - [Start with the object](#start-with-the-object)
 - [Design for a window](#design-for-a-window)
@@ -13,6 +14,23 @@
 - [Icons and copy](#icons-and-copy)
 - [Motion](#motion)
 - [Quality review](#quality-review)
+
+## Personal purpose
+
+Begin with the particular person and what they are trying to do or experience.
+Use established context to decide which information, controls, and depth earn
+space. Keep unneeded structure out of the default view while preserving access
+to useful detail. Avoid forcing every purpose into a dashboard or every moment
+into a task. Familiar primitives and accessible interactions should support
+personal composition without requiring the user to design it themselves.
+
+Optimize the useful share of the whole experience, including navigation,
+questions and setup. For a specific person's task, mark the screen and journey:
+useful now, useful at another moment, irrelevant, or unknown. Remove irrelevant
+default exposure and reveal actions at their point of need. Verify lower effort
+and successful completion; a sparse screen that hides required work is not an
+improvement. Keep predictable access to occasional essentials and preserve
+explicit layout choices. Do not equate click frequency with personal value.
 
 ## Character
 

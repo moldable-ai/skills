@@ -9,6 +9,17 @@ Build and maintain apps inside Moldable using the current host tools and public
 packages. Finish the requested behavior and relevant verification; resolve
 routine details without turning a small edit into a new-app workflow.
 
+## Personal fit
+
+Build around this person's actual need and established context. A useful app
+can be adopted, reshaped, simplified, or created; do not turn every request into
+a new app. Preserve useful data and intentional personal changes. Use shared
+primitives while choosing workflows and presentation for the person. Maximize
+the share of the experience useful to them now: remove irrelevant controls and
+steps, and reveal contextual actions when needed while keeping essentials
+reachable. Read
+[design](references/design.md) when choosing or substantially changing the experience.
+
 ## Core contracts
 
 - App source is shared at `$MOLDABLE_HOME/shared/apps/{app-id}` (default

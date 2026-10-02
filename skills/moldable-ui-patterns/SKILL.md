@@ -5,7 +5,12 @@ description: "Build or review Moldable React app interfaces using @moldable-ai/u
 
 # Moldable UI Patterns
 
-Build interfaces that feel like focused desktop tools: quiet, compact, responsive, and complete in every state.
+Build interfaces that fit the person's purpose: quiet, responsive, and complete
+in every state. Use established context to choose the workflow, density, and
+composition; shared controls do not require a universal layout. Support useful
+subtraction and preserve intentional personal adaptations. Maximize the share
+of UX/UI useful to this person now; reveal contextual controls when needed
+without making essential actions harder to find.
 
 ## Guidance by task
 

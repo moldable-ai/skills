@@ -10,6 +10,33 @@ checks, also read the sibling
 Use the component guides shipped with `@moldable-ai/ui`; this file owns product
 composition rather than duplicating every component API.
 
+## Personal purpose
+
+Use the person's established vocabulary, circumstances, preferences, and
+corrections to choose the experience. Ask what those facts change about the
+workflow or interface. Do not infer a life model from demographics or add a
+standard dashboard, goal system, or Bot roster without a demonstrated need.
+
+Choose the smallest complete experience. Removing irrelevant controls can be
+more useful than adding options. Preserve intentional adaptations and existing
+data. A photo, instrument, or moment of curiosity can be a complete experience
+without a task or progress metric. Personal fit does not require inventing new
+controls when familiar shared primitives work.
+
+## Useful share of the experience
+
+Optimize the proportion of UX and UI that helps this person in the current
+context. Review the whole journey: visible controls and content, navigation,
+setup, questions, and interruptions. Mark what is useful now, useful later,
+irrelevant, or unknown. Remove irrelevant default surface area and expose
+contextual actions at the point of need. Do not require the user to configure
+away our assumptions before the app becomes useful.
+
+Verify the same task takes less searching and effort without losing outcomes,
+personal choices, or access to occasional essentials. Keep navigation stable;
+automatically moving controls can cost more than the space it saves. Low usage
+alone does not make undo, permissions, or an occasional workflow expendable.
+
 ## Product Feel
 
 Moldable apps should feel like local, personal instruments: fast, quiet, specific, dense enough for repeated use, and shaped around the user's actual data. They are not websites, landing pages, demos, or SaaS dashboards.
@@ -28,10 +55,10 @@ The best Moldable app usually has:
 
 Before editing UI files, write these answers in your working notes:
 
-1. **Primary job:** What does this app help the user do in one sentence?
+1. **Person and purpose:** What does this help this person do or experience, and which established facts change the design?
 2. **Primary object:** What is the app's core object: message, meeting, row, file, note, task, event, recipe, clip, connection?
 3. **Today trigger:** When (if ever) does this app genuinely need the user on the home screen? See [today.md](today.md). Default to silence.
-4. **Full-view shape:** Choose one layout archetype from this file.
+4. **Full-view shape:** Choose the composition that fits the purpose; the archetypes below are starting points, not a required taxonomy.
 5. **State inventory:** Name the empty, loading, error, auth, permission, and busy states.
 6. **Bottom layout:** Which fixed controls need normal window or mobile-safe-area
    clearance? Do not reserve desktop space for the host channel panel.
@@ -73,7 +100,7 @@ The full contract — the endpoint shape, `TodayItem` fields, item kinds, action
 
 ## Full View Layout Archetypes
 
-Choose one archetype. Do not invent a generic dashboard unless the app genuinely needs multiple unrelated surfaces.
+Use these archetypes when they fit the primary purpose. Combine or adapt them when the person's workflow warrants it. A generic dashboard requires a concrete need for the distinct surfaces it contains.
 
 ### Full-Height Shell
 
